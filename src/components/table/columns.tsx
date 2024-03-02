@@ -2,7 +2,6 @@
 import { COLOR_EXTENSION_MAP } from "@/constants";
 import { FileType } from "@/typings";
 import { ColumnDef } from "@tanstack/react-table";
-import Link from "next/link";
 import prettyBytes from "pretty-bytes";
 import { FileIcon, defaultStyles } from "react-file-icon";
 import { ToolTip } from "@/components/Modals/ToolTip";
@@ -31,9 +30,10 @@ export const columns: ColumnDef<FileType>[] = [
     accessorKey: "type",
     header: "Type",
     cell: ({ renderValue, row, ...props }) => {
-      const link = (row?.getVisibleCells()[4]?.getValue() as string) || "";
-      const type = row?.getVisibleCells()[0]?.getValue() as string;
-  
+      const visibleCells = row?.getVisibleCells() || [];
+
+      const link = (visibleCells[4]?.getValue() as string) || "";
+      const type = (visibleCells[0]?.getValue() as string) || "";
       const isImage = isShowableImage(type);
       const isVideo = isShowableVideo(type);
   
@@ -56,7 +56,7 @@ export const columns: ColumnDef<FileType>[] = [
                 videoPlaceHolder={<div className="w-10">
                 <FileIcon
                   extension={type.split("/")[1]}
-                  labelColor={COLOR_EXTENSION_MAP[type.split("/")[1]]}
+                  labelColor={COLOR_EXTENSION_MAP['bmp']}
                   //@ts-ignore
                   {...defaultStyles[type.split("/")[1]]}
                 />
@@ -74,7 +74,7 @@ export const columns: ColumnDef<FileType>[] = [
             )}
           </a>
         </ToolTip>
-      );
+      );  
     },
   },  
   {
