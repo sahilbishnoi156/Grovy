@@ -219,7 +219,7 @@ export const Categories = ({
 
   //! Main Content
   return (
-    <div className="p-2 flex flex-col md:p-4">
+    <div className="p-3 flex flex-col">
       <div className="mt-4 md:mt-0">
         <AddCategory />
       </div>
