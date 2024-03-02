@@ -29,6 +29,7 @@ import {
 } from "@clerk/nextjs";
 import React from "react";
 import Link from "next/link";
+import { GiAlienEgg } from "react-icons/gi";
 
 export function HamburgerIcon() {
   const { user } = useUser();
@@ -36,14 +37,18 @@ export function HamburgerIcon() {
   return (
     <Sheet onOpenChange={(isOpen) => setIsOpen(isOpen)} open={isOpen}>
       <SheetTrigger asChild>
-        <CgMenuLeft
-          size={25}
-          className="hover:-rotate-45 duration-300 cursor-pointer"
-        />
+        <div>
+          <CgMenuLeft size={25} className="cursor-pointer hover:-rotate-45 duration-150" />
+        </div>
       </SheetTrigger>
       <SheetContent>
         <SheetHeader>
-          <SheetTitle className="text-2xl">Voider</SheetTitle>
+          <SheetTitle className="text-2xl">
+            <Link href={"/"} className="font-semibold flex items-center gap-2">
+              <GiAlienEgg size={30} className="text-orange-400" />
+              Grovy
+            </Link>
+          </SheetTitle>
         </SheetHeader>
         <div className="grid gap-4 py-4">
           <SignedIn>
@@ -53,7 +58,9 @@ export function HamburgerIcon() {
             <WhenSignedOutButtons user={user} setIsOpen={setIsOpen} />
           </SignedOut>
           <SheetClose asChild className="mt-0">
-            <Button variant={"secondary"}>Close</Button>
+            <Button variant={"secondary"} className="h-12">
+              Close
+            </Button>
           </SheetClose>
         </div>
       </SheetContent>
@@ -80,7 +87,7 @@ const WhenSignedInButtons = ({ user, setIsOpen }: any) => {
       <Link href={"/tasks"} className="w-full">
         <Button
           variant={"ghost"}
-          className="justify-start gap-3 text-md h-12 group w-full"
+          className="justify-start gap-3 text-md h-12 group w-full pl-2"
           onClick={() => setIsOpen(false)}
         >
           <CgGoogleTasks className="h-[1.3rem] w-[1.3rem] transition-all group-hover:scale-110" />
@@ -91,7 +98,7 @@ const WhenSignedInButtons = ({ user, setIsOpen }: any) => {
       <Link href={"/files"} className="w-full">
         <Button
           variant={"ghost"}
-          className="justify-start gap-3 text-md h-12 group w-full"
+          className="justify-start gap-3 text-md h-12 group w-full pl-2"
           onClick={() => setIsOpen(false)}
         >
           <LuFiles className="h-[1.3rem] w-[1.3rem] transition-all group-hover:scale-110" />
@@ -102,8 +109,7 @@ const WhenSignedInButtons = ({ user, setIsOpen }: any) => {
       <ThemeToggle>
         <Button
           variant={"ghost"}
-          className="justify-start gap-3 text-md h-12 group"
-          
+          className="justify-start gap-3 text-md h-12 group pl-2"
         >
           <Sun className="h-[1.3rem] w-[1.3rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
           <Moon className="absolute h-[1.3rem] w-[1.3rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100 group-hover:dark:scale-110" />
@@ -115,7 +121,7 @@ const WhenSignedInButtons = ({ user, setIsOpen }: any) => {
         <SignOutButton>
           <Button
             variant={"ghost"}
-            className="justify-start gap-3 text-md h-12 group text-red-400 hover:text-red-600"
+            className="justify-start gap-3 text-md h-12 group text-red-400 hover:text-red-600 pl-2"
             onClick={() => setIsOpen(false)}
           >
             <PiSignOutBold

@@ -21,7 +21,7 @@ export function TaskDropDown({ openDeleteModal, openRenameModal }: any) {
     }}>
       <DropdownMenuTrigger asChild>
         <div className="cursor-pointer">
-          <IoEllipsisVertical  className="text-neutral-400 hover:text-white" />
+          <IoEllipsisVertical  className="text-neutral-400 hover:dark:text-white hover:text-neutral-800" />
         </div>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56">

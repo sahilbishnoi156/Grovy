@@ -8,8 +8,6 @@ export type CardType = {
   description: string;
   categoryId: string;
   timestamp?: string | Date;
-  createdAt?: string | Date;
-  updatedAt?: string | Date;
 };
 
 export type CategoryType = {
@@ -17,8 +15,6 @@ export type CategoryType = {
   title: string;
   headingColor: string;
   fullName?: string;
-  createdAt?: string | Date;
-  updatedAt?: string | Date;
 };
 
 export type ColumnProps = {

@@ -16,10 +16,10 @@ import {
   writeBatch,
 } from "firebase/firestore";
 import { db } from "@/firebase";
-import { CardType } from "@/typings";
+import { CardType, CategoryType } from "@/typings";
 import { MoreVertical } from "lucide-react";
 import { FaPlus } from "react-icons/fa6";
-import _, { isEqual } from "lodash";
+import _, { divide, isEqual } from "lodash";
 
 import {
   ResizableHandle,
@@ -53,7 +53,7 @@ export const Categories = ({
     user &&
       query(
         collection(db, "users", user.id, "cards"),
-        orderBy("timestamp", "desc")
+        orderBy("timestamp", "asc")
       )
   );
 
@@ -94,26 +94,6 @@ export const Categories = ({
     });
   };
 
-  const updateChangedCards = async (changedCards: CardType[]) => {
-    if (!user) return;
-    try {
-      const batch = writeBatch(db);
-
-      for (const changedCard of changedCards) {
-        const cardDocRef = doc(db, "users", user.id, "cards", changedCard.id);
-        // Update the specific fields (e.g., categoryId)
-        const updatedFields = {
-          categoryId: changedCard.categoryId,
-        };
-        batch.update(cardDocRef, updatedFields);
-      }
-
-      // Commit the batch
-      await batch.commit();
-    } catch (error) {
-      console.error("Error updating changed cards:", error);
-    }
-  };
 
   const saveChanges = async () => {
     if (!user) return;
@@ -142,8 +122,16 @@ export const Categories = ({
         }
       }
 
+      // Update Changed Cards
       const changedCards = categoryChangedCards();
-      await updateChangedCards(changedCards);
+      for (const changedCard of changedCards) {
+        const cardDocRef = doc(db, "users", user.id, "cards", changedCard.id);
+        // Update the specific fields (e.g., categoryId)
+        const updatedFields = {
+          categoryId: changedCard.categoryId,
+        };
+        batch.update(cardDocRef, updatedFields);
+      }
 
       // Commit the batch
       await batch.commit();
@@ -189,43 +177,41 @@ export const Categories = ({
         <div className="h-10 my-1"></div>
         <div className="h-[.5px] w-full dark:bg-neutral-700 bg-neutral-500 mb-6"></div>
         <div className="flex gap-3 flex-wrap">
-          {skeletonCategoryFiles.map((category: any) => {
-            return (
-              <div
-                key={category.id}
-                className="min-h-10 w-72 dark:bg-neutral-900 bg-neutral-500 rounded-sm animate-pulse p-3 flex flex-col gap-3"
-              >
-                <div className="mb-3 flex items-center justify-between">
-                  <h3 className={`font-medium`}>TITLE</h3>
-                  <div className="flex gap-1 items-center">
-                    <span className="rounded text-sm text-neutral-400">0</span>
-                    <MoreVertical className="text-neutral-400 hover:text-white" />
+          {skeletonCategoryFiles &&
+            skeletonCategoryFiles.map((category: CategoryType, index: number) => {
+              return (
+                <div
+                  key={`${category.id}${index}`}
+                  className="min-h-12 w-96 dark:bg-neutral-900 bg-neutral-500 rounded-sm animate-pulse p-3 flex flex-col gap-3"
+                >
+                  <div className="mb-3 flex items-center justify-between">
+                    <h3 className={`font-medium`}>TITLE</h3>
+                    <div className="flex gap-1 items-center">
+                      <span className="rounded text-sm text-neutral-400">
+                        0
+                      </span>
+                      <MoreVertical className="text-neutral-400 hover:text-white" />
+                    </div>
+                  </div>
+                  {skeletonCardFiles &&
+                    skeletonCardFiles?.map((card: CardType, index: number) => {
+                      if (
+                        category?.id.toString() === card?.categoryId.toString()
+                      ) {
+                        return (
+                          <div
+                            key={`${card.id}${index}`}
+                            className="h-12 w-full dark:bg-neutral-800 bg-neutral-600 rounded-sm"
+                          ></div>
+                        );
+                      }
+                    })}
+                  <div className="flex gap-1 items-center text-xs">
+                    Add card <FaPlus size={10} />
                   </div>
                 </div>
-                {tempCards.map((card: any) => {
-                  if (category.id.toString() === card.categoryId.toString()) {
-                    return (
-                      <div
-                        key={card.id}
-                        className="h-10 w-full dark:bg-neutral-800 bg-neutral-600 rounded-sm"
-                      ></div>
-                    );
-                  }
-                })}
-                <div className="flex gap-1 items-center text-xs">
-                  Add card <FaPlus size={10} />
-                </div>
-                {skeletonCardFiles.map((card: any) => {
-                  return (
-                    <div
-                      key={card.id}
-                      className="h-10 w-full bg-neutral-600 rounded-sm"
-                    ></div>
-                  );
-                })}
-              </div>
-            );
-          })}
+              );
+            })}
         </div>
       </div>
     );
@@ -240,25 +226,28 @@ export const Categories = ({
       <div className="h-10 my-1">
         {isSaving && (
           <Button variant={"ghost"} className="flex gap-2 text-neutral-600">
-            {" "}
             <Spinner height="h-3" width="w-3" color="text-neutral-600" /> Saving
           </Button>
         )}
       </div>
-      <div className="h-[.5px] w-full bg-neutral-700 mb-6"></div>
-      {categories.length <= 0 && <div>Nothing here</div>}
-      {categories.length <= 3 && window.innerWidth > 920 ? (
-        <ResizableCategories
-          tempCards={tempCards}
-          categories={categories}
-          setTempCards={setTempCards}
-        />
-      ) : (
+      <div className="h-[.5px] w-full bg-neutral-700/40 dark:bg-neutral-700 mb-6"></div>
+      {(categories.length <= 0 && tempCards.length <=0) && <div>No categories created</div>}
         <div className="flex gap-3 flex-wrap md:justify-start justify-center">
-          {categories.map((category: any) => {
+          {tempCards.find(
+            (card: CardType) => card.categoryId === "uncategorized"
+          ) && (
+            <Column
+              title={"Abandoned Cards"}
+              id={"uncategorized"}
+              headingColor={"text-purple-500"}
+              cards={tempCards}
+              setCards={setTempCards}
+            />
+          )}
+          {categories.map((category: any, index: number) => {
             return (
               <Column
-                key={`${category.id}${category.title}`}
+                key={`${category.id}${category.title}${index}`}
                 title={category.title}
                 id={category.id.toString()}
                 headingColor={category.headingColor}
@@ -268,33 +257,6 @@ export const Categories = ({
             );
           })}
         </div>
-      )}
     </div>
-  );
-};
-
-const ResizableCategories = ({ categories, tempCards, setTempCards }: any) => {
-  return (
-    <ResizablePanelGroup direction="horizontal" className="w-full">
-      {categories.map((category: any, index: number) => {
-        return (
-          <>
-            <ResizablePanel
-              key={`${category.id}${category.title}`}
-              minSize={29}
-            >
-              <Column
-                title={category.title}
-                id={category.id.toString()}
-                headingColor={category.headingColor}
-                cards={tempCards}
-                setCards={setTempCards}
-              />
-            </ResizablePanel>
-            {index !== categories.length - 1 && <ResizableHandle withHandle />}
-          </>
-        );
-      })}
-    </ResizablePanelGroup>
   );
 };

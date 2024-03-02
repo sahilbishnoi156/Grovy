@@ -135,7 +135,7 @@ export const Column = ({
   };
 
   return (
-    <div className="min-w-72 w-full shrink-0 flex-1 md:px-3 mb-10">
+    <div className="md:w-96 w-full min-w-64 shrink-0 md:px-3 mb-6">
       <div className="mb-3 flex items-center justify-between">
         <h3 className={`font-medium ${headingColor}`}>
           {title}{" "}
@@ -143,12 +143,14 @@ export const Column = ({
             {filteredCards.length}
           </span>
         </h3>
-        <div className="flex gap-1 items-center">
-          <TaskDropDown
-            openDeleteModal={openDeleteModal}
-            openRenameModal={openRenameModal}
-          />
-        </div>
+        {id !== "uncategorized" && (
+          <div className="flex gap-1 items-center">
+            <TaskDropDown
+              openDeleteModal={openDeleteModal}
+              openRenameModal={openRenameModal}
+            />
+          </div>
+        )}
       </div>
       <DeleteCategoryModal />
       <RenameCategoryModal />
@@ -173,7 +175,7 @@ export const Column = ({
           );
         })}
         <DropIndicator beforeId={null} id={id.toString()} />
-        <AddCard id={id.toString()} setCards={setCards} />
+        {id !== "uncategorized" && <AddCard id={id.toString()} setCards={setCards} />}
       </div>
     </div>
   );

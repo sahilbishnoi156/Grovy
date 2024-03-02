@@ -4,10 +4,17 @@ import { db } from "@/firebase";
 import { FileType } from "@/typings";
 import { auth } from "@clerk/nextjs";
 import { collection, getDocs } from "firebase/firestore";
+import { Metadata } from "next";
 import React from "react";
 
+export const metadata: Metadata = {
+  title: "Files | Grovy - Your personal library",
+  description: "Simplify file sharing and storage with our secure file upload feature. Easily upload, manage, and share documents, images, and more. Enhance collaboration by seamlessly accessing and organizing your files. Experience the convenience of our user-friendly file upload solution for efficient team collaboration."
+};
+
+
 export default async function Files() {
-  const { userId } = auth();
+  const { userId } : { userId: string | null }  = auth();
   const docResults = await getDocs(collection(db, "users", userId!, "files"));
   const skeletonFiles: FileType[] = docResults.docs.map((doc) => ({
     id: doc.id,
