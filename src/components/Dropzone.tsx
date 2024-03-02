@@ -54,8 +54,11 @@ export default function Dropzone() {
 
   // On file upload
   const OnFileDrop = (acceptedFiles: File[]) => {
-    const promise = async () => {
-      try {
+    try {
+      const promise = async () => {
+        if (acceptedFiles.length <= 0) {
+          throw new Error("Something went wrong");
+        }
         acceptedFiles.forEach((acceptedFile: File) => {
           const reader = new FileReader();
           reader.onabort = () => console.log("file reading was aborted");
@@ -66,17 +69,19 @@ export default function Dropzone() {
           reader.readAsArrayBuffer(acceptedFile);
         });
         return acceptedFiles;
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    toast.promise(promise, {
-      loading: "Uploading...",
-      success: (data) => {
-        return `${data?.length! > 1 ? "Files" : "File"} Uploading Complete.`;
-      },
-      error: "Error",
-    });
+      };
+      toast.promise(promise, {
+        loading: "Uploading...",
+        success: (data) => {
+          return `${data?.length! > 1 ? "Files" : "File"} Uploading Complete.`;
+        },
+        error: (error) => {
+          return error.message;
+        },
+      });
+    } catch (error) {
+      console.log(error);
+    }
   };
   return (
     <DropzoneComponent onDrop={OnFileDrop} minSize={0} maxSize={maxSize}>
@@ -90,7 +95,7 @@ export default function Dropzone() {
         const isFileTooLarge =
           fileRejections.length > 0 && fileRejections[0].file.size > maxSize;
         return (
-          <section>
+          <section className="mt-5">
             <div
               {...getRootProps()}
               className={cn(

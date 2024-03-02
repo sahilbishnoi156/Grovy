@@ -5,9 +5,8 @@ import { FileType } from "@/typings";
 import { auth } from "@clerk/nextjs";
 import { collection, getDocs } from "firebase/firestore";
 import React from "react";
-import { toast } from "sonner";
 
-export default async function Dashboard() {
+export default async function Files() {
   const { userId } = auth();
   const docResults = await getDocs(collection(db, "users", userId!, "files"));
   const skeletonFiles: FileType[] = docResults.docs.map((doc) => ({
@@ -21,11 +20,11 @@ export default async function Dashboard() {
   }));
   
   return (
-    <div className="p-8">
-      <Dropzone />
-      <section className="container mt-10">
+    <div className="p-2 md:p-8">
+      <Dropzone/>
+      <section className="px-0 mt-10 md:px-8">
         <TableWrapper skeletons={skeletonFiles} />
       </section>
-    </div>
+    </div>  
   );
 }

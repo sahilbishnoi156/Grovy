@@ -10,14 +10,14 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { SORT_BY } from "@/constants";
+import { useAppStore } from "@/store/store";
 
 export function SortBy({
   sortFiles,
-  sort,
 }: {
   sortFiles: Function;
-  sort: string;
 }) {
+  const sort = useAppStore.getState().currentSort;
   return (
     <Select onValueChange={(e) => sortFiles(e)}>
       <SelectTrigger className="w-[150px]">
@@ -29,7 +29,7 @@ export function SortBy({
               ? "Newset"
               : sort === "asc"
               ? "Oldest"
-              : "Filename"
+              : "Name"
           }`}
         />
       </SelectTrigger>

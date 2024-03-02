@@ -9,24 +9,35 @@ import { collection, orderBy, query } from "firebase/firestore";
 import { db } from "@/firebase";
 import { useCollection } from "react-firebase-hooks/firestore";
 import { Skeleton } from "../ui/skeleton";
-import { SortFilter } from "../SortFilter";
+import { FiltersDropDown } from "../FiltersDropDown";
 import { SortBy } from "../SortBy";
 import { RotateCw } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
+import { useAppStore } from "@/store/store";
 
 export default function TableWrapper({ skeletons }: { skeletons: FileType[] }) {
   const { user } = useUser();
-  const [allMainFiles, setAllMainFiles] = React.useState<FileType[]>([]);
-  const [initialFiles, setInitialFiles] = React.useState<FileType[]>([]);
-  const [allFilters, setAllFilters] = React.useState<string[]>([]);
-  const [currentFilter, setCurrentFilter] = React.useState<string>("");
-  const [sort, setSort] = React.useState<"asc" | "desc" | "filename">("desc");
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const pathname = usePathname();
-  const reloadRef = React.useRef(null);
 
+  //* Global states
+  const [
+    globalFiles,
+    setGlobalFiles,
+    setGeneratedFiltersByFiles,
+    setCurrentFilter,
+    setCurrentSort,
+  ] = useAppStore((state) => [
+    state.globalFiles,
+    state.setGlobalFiles,
+    state.setGeneratedFiltersByFiles,
+    state.setCurrentFilter,
+    state.setCurrentSort,
+  ]);
+
+  //* Local States
+  const [tempFiles, setTempFiles] = React.useState<FileType[]>([]);
+
+  //* Firebase collection
   const [docs, loading, error] = useCollection(
     user &&
       query(
@@ -46,123 +57,67 @@ export default function TableWrapper({ skeletons }: { skeletons: FileType[] }) {
       type: doc.data().type,
       size: doc.data().size,
     }));
-    // Generating Filters
-    const filteredArrays1 = Array.from(
-      new Set(files.map((file) => file.type.split("/")[0]))
+    setTempFiles(files);
+    setGlobalFiles(files);
+    setCurrentFilter("all");
+    setCurrentSort("desc");
+  }, [docs, setCurrentFilter, setCurrentSort, setGlobalFiles]);
+
+  // Generate filters based on unique file types
+  React.useEffect(() => {
+    if (!globalFiles) return;
+    const uniqueTypes = Array.from(
+      new Set(globalFiles.map((file) => file.type.split("/")[0]))
     );
-    // Handle files with an empty string type by adding them to the "others" filter
-    const filteredArrays2 = [
+    const filterNamesWithoutEmptyValues = [
       "all",
-      ...filteredArrays1.filter((type) => type !== ""),
+      ...uniqueTypes.filter((type) => type !== ""),
     ];
-    // Put the "others" filter at the end
-    if (!filteredArrays2.includes("other")) {
-      filteredArrays2.push("other");
+    if (
+      !filterNamesWithoutEmptyValues.includes("other") &&
+      uniqueTypes.find((type) => type === "")
+    ) {
+      filterNamesWithoutEmptyValues.push("other");
     }
-    setAllFilters(filteredArrays2);
-    setInitialFiles(files);
-    setAllMainFiles(files);
-  }, [docs]);
+    setGeneratedFiltersByFiles(filterNamesWithoutEmptyValues);
+  }, [globalFiles, setGeneratedFiltersByFiles]);
 
-  const createQueryString = useCallback(
-    (name: string, value: string) => {
-      const params = new URLSearchParams(searchParams.toString());
-      params.set(name, value);
-
-      return params.toString();
-    },
-    [searchParams]
-  );
-
-  const sortFiles = (e: string, filteredFiles: FileType[] = initialFiles) => {
-    router.replace(pathname + "?" + createQueryString("sortby", e), {
-      scroll: false,
-    });
-
-    if (e === "asc" || e === "desc" || e === "filename") {
-      let sortedFiles: FileType[] = [...filteredFiles];
-
-      if (e === "asc") {
-        sortedFiles = [...filteredFiles].sort(
-          (a, b) => a.timestamp.getTime() - b.timestamp.getTime()
-        );
-      } else if (e === "desc") {
-        sortedFiles = [...filteredFiles].sort(
-          (a, b) => b.timestamp.getTime() - a.timestamp.getTime()
-        );
-      } else if (e === "filename") {
-        sortedFiles = [...filteredFiles].sort((a, b) =>
-          a.filename.localeCompare(b.filename)
-        );
-      }
-
-      setInitialFiles(sortedFiles);
-      setSort(e);
-      return sortFiles;
+  // Sort files based on selected sort option
+  const sortFiles = (sortOption: "asc" | "desc" | "filename") => {
+    setCurrentSort(sortOption);
+    const sortedFiles = [...tempFiles]; // Copy to avoid mutation
+    if (sortOption === "asc") {
+      sortedFiles.sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
+    } else if (sortOption === "desc") {
+      sortedFiles.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
+    } else if (sortOption === "filename") {
+      sortedFiles.sort((a, b) => a.filename.localeCompare(b.filename));
     }
+    setTempFiles(sortedFiles);
   };
 
-  const filterFiles = (currentFilter: string) => {
-    if (currentFilter === "all") {
-      if (docs) {
-        const files = docs.docs.map((doc) => ({
-          id: doc.id,
-          filename: doc.data().filename || doc.id,
-          fullName: doc.data().fullName || doc.id,
-          timestamp:
-            new Date(doc.data().timestamp?.seconds * 1000) || undefined,
-          downloadUrl: doc.data().downloadUrl,
-          type: doc.data().type,
-          size: doc.data().size,
-        }));
-        router.replace(
-          pathname + "?" + createQueryString("filter", currentFilter),
-          {
-            scroll: false,
-          }
-        );
-        setInitialFiles(files);
-      }
+  // Filter files based on selected filter
+  const filterFiles = (filter: string) => {
+    setCurrentFilter(filter);
+    if (filter === "all") {
+      setTempFiles(globalFiles);
     } else {
-      const filteredFiles = allMainFiles.filter((file) => {
-        if (currentFilter === "other") {
+      const filteredFiles = globalFiles.filter((file) => {
+        if (filter === "other") {
           return file.type.split("/")[0] === "";
         }
-        return file.type.split("/")[0] === currentFilter;
+        return file.type.split("/")[0] === filter;
       });
-
-      setInitialFiles(filteredFiles);
-      return filteredFiles;
+      setTempFiles(filteredFiles);
     }
   };
-
-  // Read query parameters on component mount
-  React.useEffect(() => {
-    const currentFilter = searchParams.get("filter");
-    const currentSort = searchParams.get("sortby");
-    if (currentFilter) {
-      const filteredFiles = filterFiles(currentFilter);
-      setCurrentFilter(currentFilter as string);
-      if (
-        currentSort === "asc" ||
-        currentSort === "desc" ||
-        currentSort === "filename"
-      ) {
-        setSort(currentSort);
-        sortFiles(currentSort, filteredFiles);
-      }
-    }
-  }, [allMainFiles]);
 
   if (docs?.docs.length === undefined) {
     return (
       <div className="flex flex-col space-y-5 pb-10">
         <div className="flex items-center justify-between">
           <div className="flex gap-4 items-center">
-            <h2 className="font-bold ml-2 ">All Files </h2>
-            <Button variant={"ghost"}>
-              <RotateCw size={20} />
-            </Button>
+            <h2 className="font-bold ml-2 ">My Files</h2>
           </div>
           <div className="flex gap-4 items-center ">
             <Button variant={"outline"} className="w-36 h-12 mb-5"></Button>
@@ -188,47 +143,19 @@ export default function TableWrapper({ skeletons }: { skeletons: FileType[] }) {
     );
   }
 
-  const refreshData = () => {
-    const promise = () =>
-      new Promise((resolve) =>
-        setTimeout(() => resolve({ name: "Sonner" }), 5000)
-      );
-    toast.promise(promise, {
-      loading: "Refreshing...",
-      success: () => {
-        return `Files updated`;
-      },
-      error: "Error",
-    });
-    if (reloadRef.current) {
-      reloadRef.current.click();
-    }
-  };
-
   return (
     <div className="flex flex-col space-y-5 pb-10">
-      <a href={pathname} ref={reloadRef}></a>
-      <div className="flex items-center justify-between">
+      <div className="flex items-start justify-between sm:flex-row flex-col lg:items-center">
         <div className="flex gap-4 items-center justify-end">
-          <h2 className="font-bold ml-2 ">All Files </h2>
-          <Button variant={"ghost"} onClick={refreshData}>
-            <RotateCw
-              className="cursor-pointer hover:rotate-90 duration-200"
-              size={20}
-            />
-          </Button>
+          <h2 className="font-bold ml-2 ">My Files</h2>
         </div>
-        <div className="flex gap-4 items-center justify-end">
-          <SortFilter
-            filterFiles={filterFiles}
-            allFilters={allFilters}
-            currentFilter={currentFilter}
-          />
-          <SortBy sortFiles={sortFiles} sort={sort} />
+        <div className="flex gap-1 items-center justify-end flex-wrap">
+          <FiltersDropDown filterFiles={filterFiles} />
+          <SortBy sortFiles={sortFiles} />
         </div>
       </div>
 
-      <DataTable columns={columns} data={initialFiles} />
+      <DataTable columns={columns} data={tempFiles} />
     </div>
   );
 }

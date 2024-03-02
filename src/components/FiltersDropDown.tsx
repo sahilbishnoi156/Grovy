@@ -9,31 +9,31 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Button } from "./ui/button";
+import { useAppStore } from "@/store/store";
 
-export function SortFilter({
-  filterFiles,
-  allFilters,
-  currentFilter,
-}: {
-  filterFiles: Function;
-  allFilters: string[];
-  currentFilter: string;
-}) {
+export function FiltersDropDown({ filterFiles }: { filterFiles: Function }) {
+  const currentFilter = useAppStore.getState().currentFilter;
+  function capitalizeFirstLetter(str: string) {
+    return str.charAt(0).toUpperCase() + str.slice(1);
+  }
   return (
     <Select onValueChange={(e) => filterFiles(e)}>
       <SelectTrigger className="w-[150px]">
         <SelectValue
-          placeholder={`${currentFilter ? currentFilter : "Filters"}`}
+          placeholder={`${
+            currentFilter ? capitalizeFirstLetter(currentFilter) : "Filters"
+          }`}
         />
       </SelectTrigger>
       <SelectContent>
         <SelectGroup>
           <SelectLabel>Choose</SelectLabel>
-          {allFilters.map((filter) => {
+          {(
+            (useAppStore.getState().generatedFiltersByFiles as string[]) || []
+          ).map((filter) => {
             return (
               <SelectItem value={filter} key={filter}>
-                {filter}
+                {capitalizeFirstLetter(filter)}
               </SelectItem>
             );
           })}

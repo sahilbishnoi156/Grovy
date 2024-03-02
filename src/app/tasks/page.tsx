@@ -1,12 +1,33 @@
-import { Button } from '@/components/ui/button'
-import Link from 'next/link'
-import React from 'react'
+import React from "react";
+import prisma from "@/lib/client";
+import { Categories } from "@/components/Tasks/Categories";
+import { auth } from "@clerk/nextjs";
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "@/firebase";
+import { CategoryType } from "@/typings";
 
-export default function pages() {
-  return (
-    <div className='h-[90vh] w-full flex items-center justify-center text-2xl flex-col gap-4'>
-        Still Implimenting
-        <Button><Link href={'/'}>Go Back</Link></Button>
-    </div>
-  )
+export default async function pages() {
+  const { userId } = auth();
+
+  // getting Data from database
+  const categoryDocs = await getDocs(collection(db, "users", userId!, "categories"));
+  const cardsDocs = await getDocs(collection(db, "users", userId!, "cards"));
+
+  // Getting array of data
+  const skeletonCategoryFiles: CategoryType[] = categoryDocs.docs.map((doc) => ({
+    id: doc.id,
+    title: doc.data().title || doc.id,
+    fullName: doc.data().fullName || doc.id,
+    headingColor: doc.data().headingColor || doc.id,
+    timestamp: new Date(doc.data().timestamp?.seconds * 1000) || undefined,
+  })) || [];
+
+  const skeletonCardFiles: CategoryType[] = cardsDocs.docs.map((doc) => ({
+    id: doc.id,
+    title: doc.data().title || doc.id,
+    fullName: doc.data().fullName || doc.id,
+    headingColor: doc.data().headingColor || doc.id,
+    timestamp: new Date(doc.data().timestamp?.seconds * 1000) || undefined,
+  })) || [];
+  return <Categories skeletonCategoryFiles={skeletonCategoryFiles} skeletonCardFiles={skeletonCardFiles} />;
 }

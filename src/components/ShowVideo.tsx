@@ -10,22 +10,29 @@ const VideoComponent = ({ videoSource, videoPlaceHolder }: any) => {
   };
 
   const handleLeave = () => {
+    if(!videoRef.current) return;
     videoRef?.current?.pause();
     videoRef.current.currentTime = 0;
   };
 
   React.useEffect(() => {
-    videoRef?.current?.addEventListener("timeupdate", () => {
-      if (videoRef?.current?.currentTime === videoRef?.current?.duration) {
-        videoRef.current.currentTime = 0;
+    const videoNode = videoRef?.current;
+  
+    const handleTimeUpdate = () => {
+      if (videoNode?.currentTime === videoNode?.duration) {
+        if (!videoNode) return;
+        videoNode.currentTime = 0;
       }
-    });
-
+    };
+  
+    videoNode?.addEventListener("timeupdate", handleTimeUpdate);
+  
     // Cleanup event listener on component unmount
     return () => {
-      videoRef?.current?.removeEventListener("timeupdate", () => {});
+      videoNode?.removeEventListener("timeupdate", handleTimeUpdate);
     };
-  }, []);
+  }, [videoRef]);
+  
 
   const handleLoad = () => {
     setIsLoading(false);
@@ -66,7 +73,6 @@ const VideoComponent = ({ videoSource, videoPlaceHolder }: any) => {
 
 const ShowVideo = ({ row, videoPlaceHolder }: any) => {
   const videoSource = row?.getVisibleCells()[4]?.getValue() as string;
-  console.log(videoSource)
   return (
     <Suspense fallback={<Spinner />}>
       <VideoComponent
