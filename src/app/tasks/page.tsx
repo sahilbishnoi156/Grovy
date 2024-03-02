@@ -1,5 +1,4 @@
 import React from "react";
-import prisma from "@/lib/client";
 import { Categories } from "@/components/Tasks/Categories";
 import { auth } from "@clerk/nextjs";
 import { collection, getDocs } from "firebase/firestore";

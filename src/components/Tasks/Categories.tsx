@@ -20,7 +20,7 @@ import { CardType } from "@/typings";
 import { MoreVertical } from "lucide-react";
 import { FaPlus } from "react-icons/fa6";
 import _, { isEqual } from "lodash";
-import { DEFAULT_CARDS } from "@/constants";
+
 import {
   ResizableHandle,
   ResizablePanel,
@@ -110,7 +110,6 @@ export const Categories = ({
 
       // Commit the batch
       await batch.commit();
-      console.log("Changed cards updated successfully!");
     } catch (error) {
       console.error("Error updating changed cards:", error);
     }
@@ -139,7 +138,6 @@ export const Categories = ({
       for (const globalCard of cards) {
         const tempCard = tempCards.find((card) => card.id === globalCard.id);
         if (!tempCard) {
-          console.log("card deleted");
           batch.delete(doc(db, "users", user.id, "cards", globalCard.id));
         }
       }
@@ -149,7 +147,6 @@ export const Categories = ({
 
       // Commit the batch
       await batch.commit();
-      console.log("Tasks updated successfully!");
     } catch (error) {
       console.error("Error while updating the data:", error);
     } finally {

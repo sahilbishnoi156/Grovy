@@ -9,7 +9,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { db } from "@/firebase";
-import { useAppStore } from "@/store/store";
 import { useUser } from "@clerk/nextjs";
 import { doc, updateDoc } from "firebase/firestore";
 import { Input } from "@/components/ui/input";

@@ -7,14 +7,11 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
-import { db, storage } from "@/firebase";
+import { db } from "@/firebase";
 import { useTaskStore } from "@/store/TaskStore";
-import { useAppStore } from "@/store/store";
 import { useUser } from "@clerk/nextjs";
 import { deleteDoc, doc } from "firebase/firestore";
-import { deleteObject, ref } from "firebase/storage";
 import React from "react";
 import { toast } from "sonner";
 

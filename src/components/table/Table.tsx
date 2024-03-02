@@ -1,6 +1,4 @@
-/* eslint-disable @next/next/no-img-element */
 "use client";
-
 import {
   ColumnDef,
   flexRender,
@@ -16,15 +14,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Button } from "../ui/button";
-import { FileType } from "@/typings";
-import { PencilIcon, TrashIcon } from "lucide-react";
-import { useAppStore } from "@/store/store";
 import { DeleteModal } from "../Modals/DeleteModal";
 import { RenameModal } from "../Modals/RenameModal";
-import { ToolTip } from "../Modals/ToolTip";
-import Image from "next/image";
-import ShowVideo from "../ShowVideo";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];

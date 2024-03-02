@@ -1,5 +1,5 @@
 "use client";
-import React, { useCallback } from "react";
+import React from "react";
 import { FileType } from "@/typings";
 import { Button } from "../ui/button";
 import { DataTable } from "./Table";
@@ -11,9 +11,6 @@ import { useCollection } from "react-firebase-hooks/firestore";
 import { Skeleton } from "../ui/skeleton";
 import { FiltersDropDown } from "../FiltersDropDown";
 import { SortBy } from "../SortBy";
-import { RotateCw } from "lucide-react";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { toast } from "sonner";
 import { useAppStore } from "@/store/store";
 
 export default function TableWrapper({ skeletons }: { skeletons: FileType[] }) {
