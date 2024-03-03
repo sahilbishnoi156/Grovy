@@ -40,16 +40,14 @@ export function AddCategory() {
   // component states
   const [headingColor, setHeadingColor] = React.useState("text-white");
   const [open, setOpen] = React.useState(false);
-  const [isCreating, setIsCreating] = React.useState(false);
   const { isLoaded, isSignedIn, user } = useUser();
   // zustand state
   const categories = useTaskStore((state) => state.categories);
 
   // Form Submition
   const onFormSubmit = async (data: CategoryForm) => {
-    if (!user) return;
-    if (isCreating) return;
-    setIsCreating(true);
+    if(data.headingColor) return false;
+    if (!user) return false;
     const newData = { ...data, headingColor: headingColor };
     if (categories.find((c) => c.title === newData.title)) {
       throw new Error("Category Already Exists");
@@ -65,7 +63,7 @@ export function AddCategory() {
         timestamp: serverTimestamp(),
       }
     );
-    setIsCreating(false);
+    return true;
   };
 
   return (
@@ -87,13 +85,18 @@ export function AddCategory() {
           className="flex items-center space-y-4 flex-col w-full"
           onSubmit={handleSubmit((data) => {
             const promise = async () => {
-              await onFormSubmit(data);
+              const value = await onFormSubmit(data);
+              return value;
             };
             toast.promise(promise, {
               loading: "Creating Category...",
-              success: (data) => {
+              success: (data: boolean) => {
                 setOpen(false);
-                return `Category created.`;
+                if(data) {
+                  return `Category created.`;
+                }else{
+                  return 'something went wrong please refresh'
+                }
               },
               error: (error) => {
                 console.log(error);
@@ -110,7 +113,7 @@ export function AddCategory() {
             <Label htmlFor="category" className="sr-only">
               Title
             </Label>
-            <Input id="category" {...register("title")} placeholder="Title" />
+            <Input id="category" {...register("title")} placeholder="Title" disabled={isSubmitting} />
             <span className="text-xs text-red-500">
               {errors.title?.message}
             </span>
@@ -121,7 +124,7 @@ export function AddCategory() {
               {...register("headingColor")}
               placeholder="headingColor"
               className="hidden"
-              value={"text-white"}
+              disabled={isSubmitting}
             />
             {CATEGORY_COLOR.map((color) => {
               return (
@@ -143,7 +146,7 @@ export function AddCategory() {
                 Close
               </Button>
             </DialogClose>
-            <Button type="submit" variant="default">
+            <Button type="submit" variant="default" disabled={isSubmitting}>
               {isSubmitting ? <Spinner /> : "Create"}
             </Button>
           </DialogFooter>

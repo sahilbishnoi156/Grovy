@@ -8,23 +8,46 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { db } from "@/firebase";
 import { useTaskStore } from "@/store/TaskStore";
 import { CardType } from "@/typings";
+import { useUser } from "@clerk/nextjs";
+import { deleteDoc, doc } from "firebase/firestore";
 import React from "react";
 import { toast } from "sonner";
 
-export function DeleteCardModal({ setCards }: any) {
+export function DeleteCardModal() {
+  const { user } = useUser();
+
+  //* Global State
   const [isDeleteCardOpen, setIsDeleteCardOpen, cardId] = useTaskStore(
     (state) => [state.isDeleteCardOpen, state.setIsDeleteCardOpen, state.cardId]
   );
 
-  const handleDeleteCard = () => {
-    if (!cardId) return;
-    setCards((pv: CardType[]) =>
-      pv.filter((c) => c.id.toString() !== cardId.toString())
-    );
-    toast.success("Task deleted successfully")
-    setIsDeleteCardOpen(false);
+  //* Local State
+  const [isDeleting, setIsDeleting] = React.useState(false)
+
+  const handleDeleteCard = async () => {
+    setIsDeleting(true)
+    const promise = async () => {
+      if (!user || !cardId) return;
+      try {
+        await deleteDoc(doc(db, "users", user.id, "cards", cardId));
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setIsDeleting(false)
+        setIsDeleteCardOpen(false);
+      }
+    };
+
+    toast.promise(promise, {
+      loading: "Deleting task...",
+      success: (data) => {
+        return `Task deleted successfully`;
+      },
+      error: "Error",
+    });
   };
 
   return (
@@ -36,10 +59,9 @@ export function DeleteCardModal({ setCards }: any) {
     >
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Are you sure you want to delete?</DialogTitle>
+          <DialogTitle className="text-red-400">Ohoooooo!</DialogTitle>
           <DialogDescription>
-            This action cannot be undone. This will permanently delete your
-            card!
+            Are you really deleting this task? This action cannot be undone.
           </DialogDescription>
         </DialogHeader>
         <DialogFooter className="sm:justify-start">
@@ -51,7 +73,7 @@ export function DeleteCardModal({ setCards }: any) {
             <span className="sr-only">Close</span>
             <span>Close</span>
           </Button>
-          <Button type="button" variant="danger" onClick={handleDeleteCard}>
+          <Button type="button" variant="danger" onClick={handleDeleteCard} disabled={isDeleting}>
             <span className="sr-only">Delete</span>
             <span>Delete</span>
           </Button>

@@ -113,14 +113,7 @@ export const Categories = ({
           });
         }
       }
-      // Check for deleted cards and add them to the batch
-      for (const globalCard of cards) {
-        const tempCard = tempCards.find((card) => card.id === globalCard.id);
-        if (!tempCard) {
-          batch.delete(doc(db, "users", user.id, "cards", globalCard.id));
-        }
-      }
-
+      
       // Update Changed Cards
       const changedCards = categoryChangedCards();
       for (const changedCard of changedCards) {

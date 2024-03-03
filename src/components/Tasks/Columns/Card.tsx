@@ -19,7 +19,7 @@ export const Card = ({
         useTaskStore.setState({ isDeleteCardOpen: true });
       }}
     >
-      <DeleteCardModal setCards={setCards} />
+      <DeleteCardModal />
       <DropIndicator beforeId={id} id={categoryId} />
       <motion.div
         layout

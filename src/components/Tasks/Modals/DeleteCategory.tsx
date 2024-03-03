@@ -12,7 +12,7 @@ import { db } from "@/firebase";
 import { useTaskStore } from "@/store/TaskStore";
 import { CardType } from "@/typings";
 import { useUser } from "@clerk/nextjs";
-import { Firestore, collection, deleteDoc, doc, getDocs, writeBatch } from "firebase/firestore";
+import { collection, doc, getDocs, writeBatch } from "firebase/firestore";
 import React from "react";
 import { toast } from "sonner";
 

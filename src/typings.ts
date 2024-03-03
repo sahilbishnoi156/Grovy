@@ -42,7 +42,8 @@ export type AddCardProps = {
 
 export const CategorySchema = z.object({
   title: z.string().min(2, "Title Is Invalid").max(255),
-  headingColor: z.string().min(2, "Title Is Invalid").max(255).default('text-white'),
+  headingColor: z
+    .string().optional().transform((e) => (e === "" ? undefined : e)),
 });
 
 export type FileType = {
@@ -53,4 +54,4 @@ export type FileType = {
   downloadUrl: string;
   type: string;
   size: number;
-}
+};
