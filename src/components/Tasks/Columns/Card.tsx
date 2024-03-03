@@ -40,7 +40,7 @@ export const Card = ({
           {link && (
             <a
               href={link || "/"}
-              className="text-blue-500 cursor-pointer inline-block"
+              className="hover:text-blue-500 text-neutral-500 cursor-pointer inline-block mr-2"
               target="_blank"
             >
               <FaLink size={17} />
@@ -49,7 +49,7 @@ export const Card = ({
           {file && (
             <a
               href={file || "/"}
-              className="text-blue-500 cursor-pointer inline-block"
+              className="hover:text-blue-500 text-neutral-500 cursor-pointer inline-block"
               target="_blank"
             >
               <LuFiles size={17} />

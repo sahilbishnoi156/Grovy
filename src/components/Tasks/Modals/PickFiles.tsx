@@ -29,18 +29,18 @@ export function PickFile({ setFile, file }: any) {
         <div className="grid gap-4 py-4">
           {useAppStore
             .getState()
-            .globalFiles.map((file: FileType, index: number) => {
+            .globalFiles.map((card: FileType, index: number) => {
               return (
                 <Button
-                  key={file.id}
-                  variant={"ghost"}
+                  key={card.id}
+                  variant={card.filename === file ? "secondary" : "ghost"}
                   className="justify-start"
                   onClick={() => {
-                    setFile(file.filename)
+                    setFile(card.filename)
                     setIsOpen(false)
                   }}
                 >
-                  {index + 1}. {file.filename}
+                  {index + 1}. {card.filename}
                 </Button>
               );
             })}
