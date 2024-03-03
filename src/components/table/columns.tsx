@@ -10,12 +10,17 @@ import { useAppStore } from "@/store/store";
 import Image from "next/image";
 import ShowVideo from "../ShowVideo";
 import { Button } from "../ui/button";
+import ShowImage from "../ShowImage";
 
 const openRenameModal = (fileId: string, filename: string) => {
-  useAppStore.setState({fileId: fileId, filename: filename, isRenameModalOpen: true});
+  useAppStore.setState({
+    fileId: fileId,
+    filename: filename,
+    isRenameModalOpen: true,
+  });
 };
 const openDeleteModal = (fileId: string) => {
-  useAppStore.setState({fileId: fileId, isDeletingModalOpen: true});
+  useAppStore.setState({ fileId: fileId, isDeletingModalOpen: true });
 };
 
 function isShowableImage(type: string) {
@@ -36,31 +41,35 @@ export const columns: ColumnDef<FileType>[] = [
       const type = (visibleCells[0]?.getValue() as string) || "";
       const isImage = isShowableImage(type);
       const isVideo = isShowableVideo(type);
-  
+
+
       return (
         <ToolTip content="open file">
           <a href={link} target="_blank" className="group">
             {isImage ? (
-              <div className="relative h-12 w-10 rounded-lg">
-                <Image
-                  src={link}
-                  alt={(row?.getVisibleCells()[1]?.getValue() as string) || "not found"}
-                  fill
-                  sizes={`sizes="(max-width: 768px) 48px, (max-width: 1200px) 48px, 48px"`}
-                  className="rounded-lg object-cover"
-                />
-              </div>
+              <ShowImage row={row} imagePlaceholder={
+                <div className="w-10">
+                  <FileIcon
+                    extension={type.split("/")[1]}
+                    labelColor={COLOR_EXTENSION_MAP["bmp"]}
+                    //@ts-ignore
+                    {...defaultStyles[type.split("/")[1]]}
+                  />
+                </div>
+              }/>
             ) : isVideo ? (
               <ShowVideo
                 row={row}
-                videoPlaceHolder={<div className="w-10">
-                <FileIcon
-                  extension={type.split("/")[1]}
-                  labelColor={COLOR_EXTENSION_MAP['bmp']}
-                  //@ts-ignore
-                  {...defaultStyles[type.split("/")[1]]}
-                />
-              </div>}
+                videoPlaceHolder={
+                  <div className="w-10">
+                    <FileIcon
+                      extension={type.split("/")[1]}
+                      labelColor={COLOR_EXTENSION_MAP["bmp"]}
+                      //@ts-ignore
+                      {...defaultStyles[type.split("/")[1]]}
+                    />
+                  </div>
+                }
               />
             ) : (
               <div className="w-10">
@@ -74,44 +83,48 @@ export const columns: ColumnDef<FileType>[] = [
             )}
           </a>
         </ToolTip>
-      );  
+      );
     },
-  },  
+  },
   {
     accessorKey: "filename",
     header: "Filename",
-    cell: ({renderValue, row, ... props})=>{
-      return <ToolTip content="rename file">
-      <p
-        onClick={() => {
-          openRenameModal(
-            (row.original as FileType).id,
-            (row.original as FileType).filename
-          );
-        }}
-        className="hover:underline inline-flex items-center hover:cursor-pointer gap-3 group hover:text-neutral-400"
-      >
-        {renderValue() as string}
-        <PencilIcon
-          size={15}
-          className="opacity-0 group-hover:opacity-100"
-        />
-      </p>
-    </ToolTip>
-    }
+    cell: ({ renderValue, row, ...props }) => {
+      return (
+        <ToolTip content="rename file">
+          <p
+            onClick={() => {
+              openRenameModal(
+                (row.original as FileType).id,
+                (row.original as FileType).filename
+              );
+            }}
+            className="hover:underline inline-flex items-center hover:cursor-pointer gap-3 group hover:text-neutral-400"
+          >
+            {renderValue() as string}
+            <PencilIcon
+              size={15}
+              className="opacity-0 group-hover:opacity-100"
+            />
+          </p>
+        </ToolTip>
+      );
+    },
   },
   {
     accessorKey: "timestamp",
     header: "Date Added",
     cell: ({ renderValue, ...props }) => {
-      return <div className="flex flex-col">
-      <div className="text-sm">
-        {(renderValue() as Date).toLocaleDateString()}
-      </div>
-      <div className="text-xs text-neutral-400">
-        {(renderValue() as Date).toLocaleTimeString()}
-      </div>
-    </div>
+      return (
+        <div className="flex flex-col">
+          <div className="text-sm">
+            {(renderValue() as Date).toLocaleDateString()}
+          </div>
+          <div className="text-xs text-neutral-400">
+            {(renderValue() as Date).toLocaleTimeString()}
+          </div>
+        </div>
+      );
     },
   },
   {
@@ -127,15 +140,15 @@ export const columns: ColumnDef<FileType>[] = [
     cell: ({ renderValue, row, ...props }) => {
       return (
         <ToolTip content="delete file" isDanger={true}>
-        <Button
-          variant={"ghost"}
-          onClick={() => {
-            openDeleteModal((row.original as FileType).id);
-          }}
-        >
-          <TrashIcon size={20} />
-        </Button>
-      </ToolTip>
+          <Button
+            variant={"ghost"}
+            onClick={() => {
+              openDeleteModal((row.original as FileType).id);
+            }}
+          >
+            <TrashIcon size={20} />
+          </Button>
+        </ToolTip>
       );
     },
   },

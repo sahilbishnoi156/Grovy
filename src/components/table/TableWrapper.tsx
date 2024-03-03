@@ -12,9 +12,15 @@ import { Skeleton } from "../ui/skeleton";
 import { FiltersDropDown } from "../FiltersDropDown";
 import { SortBy } from "../SortBy";
 import { useAppStore } from "@/store/store";
+import { Search } from "lucide-react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import _ from "lodash";
 
 export default function TableWrapper({ skeletons }: { skeletons: FileType[] }) {
   const { user } = useUser();
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
+  const { replace } = useRouter();
 
   //* Global states
   const [
@@ -42,6 +48,30 @@ export default function TableWrapper({ skeletons }: { skeletons: FileType[] }) {
         orderBy("timestamp", "desc")
       )
   );
+
+  //* Search function 
+  function debouncedSearch(term: string) {
+    const params = new URLSearchParams(searchParams);
+    if (term) {
+      const searchedFiles = globalFiles.filter(
+        (file) =>
+          file.filename.toLowerCase().includes(term.toLowerCase()) ||
+          file.timestamp.toLocaleDateString().includes(term.toLowerCase())
+      );
+      setTempFiles(searchedFiles);
+      params.set("query", term);
+    } else {
+      setTempFiles(globalFiles);
+      params.delete("query");
+    }
+    replace(`${pathname}?${params.toString()}`);
+  }
+  const handleSearchFile = _.debounce(debouncedSearch, 500);
+
+  // React.useEffect(()=>{
+  //   if(!searchParams.get("query")) return;
+  //   handleSearchFile(searchParams.get("query") as string);
+  // })
 
   React.useEffect(() => {
     if (!docs) return;
@@ -121,10 +151,22 @@ export default function TableWrapper({ skeletons }: { skeletons: FileType[] }) {
             <Button variant={"outline"} className="w-36 h-12 mb-5"></Button>
           </div>
         </div>
-
+        <div className="relative dark:text-white text-black bg-transparent w-full">
+          <span className="absolute inset-y-0 left-0 flex items-center pl-2">
+            <Search size={18} />
+          </span>
+          <input
+            type="search"
+            name="searchQuery"
+            className="py-[0.55rem] text-sm rounded-md pl-8 pr-2 focus:outline-none bg-transparent border-[1px] focus:border-white md:w-96 w-full"
+            disabled
+            placeholder="Filename"
+            autoComplete="off"
+          />
+        </div>
         <div className="border rounded-lg">
           <div className="border-b h-12"></div>
-          {skeletons.map((file: FileType) => {
+          {skeletons.slice(0, 3).map((file: FileType) => {
             return (
               <div
                 key={file.id}
@@ -142,11 +184,27 @@ export default function TableWrapper({ skeletons }: { skeletons: FileType[] }) {
 
   return (
     <div className="flex flex-col space-y-5 pb-10">
-      <div className="flex items-start justify-between sm:flex-row flex-col lg:items-center">
-        <div className="flex gap-4 items-center justify-end">
-          <h2 className="font-bold ml-2 ">My Files</h2>
+      <div className="flex gap-4 items-center">
+        <h2 className="font-bold ml-2 ">My Files</h2>
+      </div>
+      <div className="flex items-start justify-between sm:flex-row flex-col lg:items-center gap-2">
+        <div className="relative dark:text-white text-black bg-transparent w-full">
+          <span className="absolute inset-y-0 left-0 flex items-center pl-2">
+            <Search size={18} />
+          </span>
+          <input
+            type="search"
+            name="searchQuery"
+            className="py-[0.55rem] text-sm rounded-md pl-8 pr-2 focus:outline-none bg-transparent border-[1px] focus:border-white md:w-96 w-full"
+            placeholder="Filename"
+            onChange={(e) => {
+              handleSearchFile(e.target.value);
+            }}
+            autoComplete="off"
+            defaultValue={searchParams.get("query")?.toString()}
+          />
         </div>
-        <div className="flex gap-1 items-center justify-end flex-wrap">
+        <div className="flex gap-1 items-center justify-start md:justify-end flex-wrap w-full">
           <FiltersDropDown filterFiles={filterFiles} />
           <SortBy sortFiles={sortFiles} />
         </div>
