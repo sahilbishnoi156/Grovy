@@ -18,8 +18,9 @@ import { LuFiles } from "react-icons/lu";
 import { CgGoogleTasks } from "react-icons/cg";
 import { PiSignOutBold } from "react-icons/pi";
 import { ThemeToggle } from "./ThemeToggle";
-import { Moon, Sun } from "lucide-react";
+import { Calendar, Moon, Sun } from "lucide-react";
 import { LuLock } from "react-icons/lu";
+import { CiCalendarDate } from "react-icons/ci";
 import {
   SignInButton,
   SignOutButton,
@@ -38,7 +39,10 @@ export function HamburgerIcon() {
     <Sheet onOpenChange={(isOpen) => setIsOpen(isOpen)} open={isOpen}>
       <SheetTrigger asChild>
         <div>
-          <CgMenuLeft size={25} className="cursor-pointer hover:-rotate-45 duration-150" />
+          <CgMenuLeft
+            size={25}
+            className="cursor-pointer hover:-rotate-45 duration-150"
+          />
         </div>
       </SheetTrigger>
       <SheetContent>
@@ -62,6 +66,12 @@ export function HamburgerIcon() {
               Close
             </Button>
           </SheetClose>
+          <div className="flex items-center justify-start gap-1 text-xs text-neutral-400">
+            Last updated: 
+            <Calendar size={13} />
+            <span>3/4/2024</span>
+            <span className="sr-only">Last updated time</span>
+          </div>
         </div>
       </SheetContent>
     </Sheet>

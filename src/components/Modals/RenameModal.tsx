@@ -33,12 +33,11 @@ export function RenameModal() {
       if (!user || !fileId) return;
       try {
         await updateDoc(doc(db, "users", user.id, "files", fileId), {
-          filename: input,
+          filename: input || filename,
         });
       } catch (error) {
         console.log(error);
       } finally {
-        setInput("");
         setIsRenameModalOpen(false);
       }
     };
