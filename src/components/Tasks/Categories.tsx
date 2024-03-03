@@ -134,7 +134,7 @@ export const Categories = ({
     }
   };
 
-  const debouncedSaveChanges = _.debounce(saveChanges, 5000);
+  const debouncedSaveChanges = _.debounce(saveChanges, 2000);
 
   const isInitialMount = React.useRef(true);
   React.useEffect(() => {

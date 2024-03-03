@@ -7,6 +7,13 @@ import { TaskDropDown } from "@/components/DropDown";
 import { useTaskStore } from "@/store/TaskStore";
 import { DeleteCategoryModal } from "../Modals/DeleteCategory";
 import { RenameCategoryModal } from "../Modals/RenameCategory";
+import { Button } from "@/components/ui/button";
+import { Trash } from "lucide-react";
+import { ToolTip } from "@/components/Modals/ToolTip";
+import { useUser } from "@clerk/nextjs";
+import { deleteDoc, doc } from "firebase/firestore";
+import { db } from "@/firebase";
+import { toast } from "sonner";
 
 export const Column = ({
   id,
@@ -15,6 +22,7 @@ export const Column = ({
   cards,
   setCards,
 }: ColumnProps) => {
+  const { user } = useUser();
   const [active, setActive] = useState(false);
   const [setIsDeletingModalOpen, setIsRenameCategoryOpen] = useTaskStore(
     (state) => [state.setIsDeleteCategoryOpen, state.setIsRenameCategoryOpen]
@@ -133,6 +141,36 @@ export const Column = ({
     useTaskStore.setState({ categoryColor: headingColor });
     setIsRenameCategoryOpen(true);
   };
+  //* Local State
+  const [isDeleting, setIsDeleting] = React.useState(false);
+
+  const handleDeleteAbandonedCards = async () => {
+    setIsDeleting(true);
+    const promise = async () => {
+      if (!user) return;
+      const abandonedCards = cards.filter(
+        (card) => card.categoryId === "uncategorized"
+      );
+      try {
+        if (!abandonedCards.length) return;
+        abandonedCards.forEach(async (card) => {
+          await deleteDoc(doc(db, "users", user.id, "cards", card.id));
+        });
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setIsDeleting(false);
+      }
+    };
+
+    toast.promise(promise, {
+      loading: "Deleting abandoned tasks...",
+      success: (data) => {
+        return `Tasks deleted successfully`;
+      },
+      error: "Error",
+    });
+  };
 
   return (
     <div className="md:w-96 w-full min-w-64 shrink-0 md:px-3 mb-6">
@@ -143,7 +181,19 @@ export const Column = ({
             {filteredCards.length}
           </span>
         </h3>
-        {id !== "uncategorized" && (
+        {id === "uncategorized" ? (
+          <ToolTip content="delete all">
+            <Button
+              size={"icon"}
+              variant={"ghost"}
+              className="hover:text-red-500"
+              disabled={isDeleting}
+              onClick={handleDeleteAbandonedCards}
+            >
+              <Trash size={15} />
+            </Button>
+          </ToolTip>
+        ) : (
           <div className="flex gap-1 items-center">
             <TaskDropDown
               openDeleteModal={openDeleteModal}
@@ -175,7 +225,9 @@ export const Column = ({
           );
         })}
         <DropIndicator beforeId={null} id={id.toString()} />
-        {id !== "uncategorized" && <AddCard id={id.toString()} setCards={setCards} />}
+        {id !== "uncategorized" && (
+          <AddCard id={id.toString()} setCards={setCards} />
+        )}
       </div>
     </div>
   );
