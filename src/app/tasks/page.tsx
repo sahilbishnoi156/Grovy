@@ -39,6 +39,8 @@ export default async function pages() {
       id: doc.id,
       description: doc.data().description || "TITLE",
       headingColor: doc.data().headingColor || "text-white",
+      link: doc.data().link || undefined,
+      file: doc.data().file || undefined,
       categoryId: doc.data().categoryId || "uncategorized",
       timestamp: new Date(doc.data().timestamp?.seconds * 1000) || undefined,
     })) || [];

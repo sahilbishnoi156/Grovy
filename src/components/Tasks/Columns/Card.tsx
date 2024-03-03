@@ -4,11 +4,15 @@ import { DropIndicator } from "./DropIndicator";
 import { motion } from "framer-motion";
 import { useTaskStore } from "@/store/TaskStore";
 import { DeleteCardModal } from "../Modals/DeleteCard";
+import { FaLink } from "react-icons/fa6";
+import { LuFiles } from "react-icons/lu";
 
 export const Card = ({
   description,
   id,
   categoryId,
+  link,
+  file,
   handleDragStart,
   setCards,
 }: CardProps) => {
@@ -32,6 +36,26 @@ export const Card = ({
             : "dark:border-purple-400/40 border-purple-500 shadow-lg shadow-black/30"
         }`}
       >
+        {(link || file) && <div className="inline-block">
+          {link && (
+            <a
+              href={link || "/"}
+              className="text-blue-500 cursor-pointer inline-block"
+              target="_blank"
+            >
+              <FaLink size={17} />
+            </a>
+          )}
+          {file && (
+            <a
+              href={file || "/"}
+              className="text-blue-500 cursor-pointer inline-block"
+              target="_blank"
+            >
+              <LuFiles size={17} />
+            </a>
+          )}
+        </div>}
         <p className="text-sm text-neutral-100">{description}</p>
       </motion.div>
     </div>

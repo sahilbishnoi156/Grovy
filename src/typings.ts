@@ -8,6 +8,8 @@ export type CardType = {
   description: string;
   categoryId: string;
   timestamp?: string | Date;
+  link?: string;
+  file?: string;
 };
 
 export type CategoryType = {

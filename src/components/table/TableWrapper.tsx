@@ -68,10 +68,10 @@ export default function TableWrapper({ skeletons }: { skeletons: FileType[] }) {
   }
   const handleSearchFile = _.debounce(debouncedSearch, 500);
 
-  // React.useEffect(()=>{
-  //   if(!searchParams.get("query")) return;
-  //   handleSearchFile(searchParams.get("query") as string);
-  // })
+  React.useEffect(()=>{
+    if(!searchParams.get("query")) return;
+    handleSearchFile(searchParams.get("query") as string);
+  },[handleSearchFile, searchParams])
 
   React.useEffect(() => {
     if (!docs) return;

@@ -20,13 +20,6 @@ import { CardType, CategoryType } from "@/typings";
 import { MoreVertical } from "lucide-react";
 import { FaPlus } from "react-icons/fa6";
 import _, { divide, isEqual } from "lodash";
-
-import {
-  ResizableHandle,
-  ResizablePanel,
-  ResizablePanelGroup,
-} from "../ui/resizable";
-
 export const Categories = ({
   skeletonCategoryFiles,
   skeletonCardFiles,
@@ -79,6 +72,8 @@ export const Categories = ({
       return {
         id: doc.id,
         description: doc.data().description,
+        link: doc.data().link || undefined,
+        file: doc.data().file || undefined,
         categoryId: doc.data().categoryId,
         timestamp: new Date(doc.data().timestamp?.seconds * 1000) || undefined,
       };

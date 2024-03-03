@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/table";
 import { DeleteModal } from "../Modals/DeleteModal";
 import { RenameModal } from "../Modals/RenameModal";
+import React from "react";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -57,6 +58,7 @@ export function DataTable<TData, TValue>({
             table.getRowModel().rows.map((row) => (
               <TableRow
                 key={row.id}
+                id={row.id}
                 data-state={row.getIsSelected() && "selected"}
               >
                 <DeleteModal />
