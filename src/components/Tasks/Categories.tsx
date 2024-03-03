@@ -83,8 +83,8 @@ export const Categories = ({
         timestamp: new Date(doc.data().timestamp?.seconds * 1000) || undefined,
       };
     });
-    setTempCards(files);
     useTaskStore.setState({ cards: files });
+    setTempCards(files);
   }, [cardsDocs]);
 
   const categoryChangedCards = () => {
@@ -93,7 +93,6 @@ export const Categories = ({
       return existingCard && existingCard.categoryId !== tempCard.categoryId;
     });
   };
-
 
   const saveChanges = async () => {
     if (!user) return;
@@ -142,20 +141,16 @@ export const Categories = ({
     }
   };
 
-  const debouncedSaveChanges = _.debounce(saveChanges, 3000);
+  const debouncedSaveChanges = _.debounce(saveChanges, 5000);
 
   const isInitialMount = React.useRef(true);
   React.useEffect(() => {
     if (isInitialMount.current) {
       isInitialMount.current = false;
     } else {
-      const saveTimeout = setTimeout(() => {
-        if (!isEqual(tempCards, cards)) {
-          debouncedSaveChanges();
-        }
-      }, 2000);
-
-      return () => clearTimeout(saveTimeout);
+      if (!isEqual(tempCards, cards)) {
+        debouncedSaveChanges();
+      }
     }
   }, [tempCards, cards, debouncedSaveChanges]);
 
@@ -178,40 +173,45 @@ export const Categories = ({
         <div className="h-[.5px] w-full dark:bg-neutral-700 bg-neutral-500 mb-6"></div>
         <div className="flex gap-3 flex-wrap">
           {skeletonCategoryFiles &&
-            skeletonCategoryFiles.map((category: CategoryType, index: number) => {
-              return (
-                <div
-                  key={`${category.id}${index}`}
-                  className="min-h-12 w-96 dark:bg-neutral-900 bg-neutral-500 rounded-sm animate-pulse p-3 flex flex-col gap-3"
-                >
-                  <div className="mb-3 flex items-center justify-between">
-                    <h3 className={`font-medium`}>TITLE</h3>
-                    <div className="flex gap-1 items-center">
-                      <span className="rounded text-sm text-neutral-400">
-                        0
-                      </span>
-                      <MoreVertical className="text-neutral-400 hover:text-white" />
+            skeletonCategoryFiles.map(
+              (category: CategoryType, index: number) => {
+                return (
+                  <div
+                    key={`${category.id}${index}`}
+                    className="min-h-12 w-96 dark:bg-neutral-900 bg-neutral-500 rounded-sm animate-pulse p-3 flex flex-col gap-3"
+                  >
+                    <div className="mb-3 flex items-center justify-between">
+                      <h3 className={`font-medium`}>TITLE</h3>
+                      <div className="flex gap-1 items-center">
+                        <span className="rounded text-sm text-neutral-400">
+                          0
+                        </span>
+                        <MoreVertical className="text-neutral-400 hover:text-white" />
+                      </div>
+                    </div>
+                    {skeletonCardFiles &&
+                      skeletonCardFiles?.map(
+                        (card: CardType, index: number) => {
+                          if (
+                            category?.id.toString() ===
+                            card?.categoryId.toString()
+                          ) {
+                            return (
+                              <div
+                                key={`${card.id}${index}`}
+                                className="h-12 w-full dark:bg-neutral-800 bg-neutral-600 rounded-sm"
+                              ></div>
+                            );
+                          }
+                        }
+                      )}
+                    <div className="flex gap-1 items-center text-xs">
+                      Add card <FaPlus size={10} />
                     </div>
                   </div>
-                  {skeletonCardFiles &&
-                    skeletonCardFiles?.map((card: CardType, index: number) => {
-                      if (
-                        category?.id.toString() === card?.categoryId.toString()
-                      ) {
-                        return (
-                          <div
-                            key={`${card.id}${index}`}
-                            className="h-12 w-full dark:bg-neutral-800 bg-neutral-600 rounded-sm"
-                          ></div>
-                        );
-                      }
-                    })}
-                  <div className="flex gap-1 items-center text-xs">
-                    Add card <FaPlus size={10} />
-                  </div>
-                </div>
-              );
-            })}
+                );
+              }
+            )}
         </div>
       </div>
     );
@@ -219,7 +219,7 @@ export const Categories = ({
 
   //! Main Content
   return (
-    <div className="p-3 flex flex-col">
+    <div className={`p-3 flex flex-col ${isSaving && "touch-none pointer-events-none"}`}>
       <div className="mt-4 md:mt-0">
         <AddCategory />
       </div>
@@ -231,32 +231,34 @@ export const Categories = ({
         )}
       </div>
       <div className="h-[.5px] w-full bg-neutral-700/40 dark:bg-neutral-700 mb-6"></div>
-      {(categories.length <= 0 && tempCards.length <=0) && <div>No categories created</div>}
-        <div className="flex gap-3 flex-wrap md:justify-start justify-center">
-          {tempCards.find(
-            (card: CardType) => card.categoryId === "uncategorized"
-          ) && (
+      {categories.length <= 0 && tempCards.length <= 0 && (
+        <div>No categories created</div>
+      )}
+      <div className="flex gap-3 flex-wrap md:justify-start justify-center">
+        {tempCards.find(
+          (card: CardType) => card.categoryId === "uncategorized"
+        ) && (
+          <Column
+            title={"Abandoned Cards"}
+            id={"uncategorized"}
+            headingColor={"text-purple-500"}
+            cards={tempCards}
+            setCards={setTempCards}
+          />
+        )}
+        {categories.map((category: any, index: number) => {
+          return (
             <Column
-              title={"Abandoned Cards"}
-              id={"uncategorized"}
-              headingColor={"text-purple-500"}
+              key={`${category.id}${category.title}${index}`}
+              title={category.title}
+              id={category.id.toString()}
+              headingColor={category.headingColor}
               cards={tempCards}
               setCards={setTempCards}
             />
-          )}
-          {categories.map((category: any, index: number) => {
-            return (
-              <Column
-                key={`${category.id}${category.title}${index}`}
-                title={category.title}
-                id={category.id.toString()}
-                headingColor={category.headingColor}
-                cards={tempCards}
-                setCards={setTempCards}
-              />
-            );
-          })}
-        </div>
+          );
+        })}
+      </div>
     </div>
   );
 };
