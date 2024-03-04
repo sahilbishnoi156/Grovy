@@ -49,9 +49,8 @@ export default function TableWrapper({ skeletons }: { skeletons: FileType[] }) {
       )
   );
 
-  //* Search function 
+  //* Search function
   function debouncedSearch(term: string) {
-    const params = new URLSearchParams(searchParams);
     if (term) {
       const searchedFiles = globalFiles.filter(
         (file) =>
@@ -59,19 +58,27 @@ export default function TableWrapper({ skeletons }: { skeletons: FileType[] }) {
           file.timestamp.toLocaleDateString().includes(term.toLowerCase())
       );
       setTempFiles(searchedFiles);
-      params.set("query", term);
     } else {
       setTempFiles(globalFiles);
-      params.delete("query");
     }
-    replace(`${pathname}?${params.toString()}`);
   }
-  const handleSearchFile = _.debounce(debouncedSearch, 500);
+  const handleSearchFile = _.debounce(debouncedSearch, 400);
 
-  React.useEffect(()=>{
-    if(!searchParams.get("query")) return;
-    handleSearchFile(searchParams.get("query") as string);
-  },[handleSearchFile, searchParams])
+  React.useEffect(() => {
+    function debouncedSearch(term: string) {
+      if (term) {
+        const searchedFiles = globalFiles.filter(
+          (file) =>
+            file.filename.toLowerCase().includes(term.toLowerCase()) ||
+            file.timestamp.toLocaleDateString().includes(term.toLowerCase())
+        );
+        setTempFiles(searchedFiles);
+      } else {
+        setTempFiles(globalFiles);
+      }
+    }
+    debouncedSearch(searchParams.get("query") as string);
+  }, [globalFiles, searchParams]);
 
   React.useEffect(() => {
     if (!docs) return;
@@ -143,28 +150,28 @@ export default function TableWrapper({ skeletons }: { skeletons: FileType[] }) {
     return (
       <div className="flex flex-col space-y-5 pb-10">
         <div className="flex gap-4 items-center">
-            <h2 className="font-bold ml-2 ">My Files</h2>
-          </div>
-        <div className="flex items-center justify-between mb-5">
-        <div className="relative dark:text-white text-black bg-transparent w-full">
-          <span className="absolute inset-y-0 left-0 flex items-center pl-2">
-            <Search size={18} />
-          </span>
-          <input
-            type="search"
-            name="searchQuery"
-            className="py-[0.55rem] text-sm rounded-md pl-8 pr-2 focus:outline-none bg-transparent border-[1px] focus:border-white md:w-96 w-full"
-            disabled
-            placeholder="Filename"
-            autoComplete="off"
-          />
+          <h2 className="font-bold ml-2 ">My Files</h2>
         </div>
+        <div className="flex items-center justify-between mb-5">
+          <div className="relative dark:text-white text-black bg-transparent w-full">
+            <span className="absolute inset-y-0 left-0 flex items-center pl-2">
+              <Search size={18} />
+            </span>
+            <input
+              type="search"
+              name="searchQuery"
+              className="py-[0.55rem] text-sm rounded-md pl-8 pr-2 focus:outline-none bg-transparent border-[1px] focus:border-white md:w-96 w-full"
+              disabled
+              placeholder="Filename"
+              autoComplete="off"
+            />
+          </div>
           <div className="flex gap-4 items-center ">
             <Button variant={"outline"} className="w-36 h-10 "></Button>
             <Button variant={"outline"} className="w-36 h-10 "></Button>
           </div>
         </div>
-        
+
         <div className="border rounded-lg">
           <div className="border-b h-12"></div>
           {skeletons.slice(0, 3).map((file: FileType) => {
@@ -198,11 +205,24 @@ export default function TableWrapper({ skeletons }: { skeletons: FileType[] }) {
             name="searchQuery"
             className="py-[0.55rem] text-sm rounded-md pl-8 pr-2 focus:outline-none bg-transparent border-[1px] focus:border-white md:w-96 w-full"
             placeholder="Filename"
+            onKeyDown={(e: any) => {
+              if (e.key === "Enter") {
+                handleSearchFile(e.target.value);
+              }
+            }}
+            defaultValue={searchParams.get("query") as string}
             onChange={(e) => {
+              const params = new URLSearchParams(searchParams);
+              if (e.target.value) {
+                params.set("query", e.target.value);
+                replace(`${pathname}?${params.toString()}`);
+              } else {
+                params.delete("query");
+                replace(`${pathname}?${params.toString()}`);
+              }
               handleSearchFile(e.target.value);
             }}
             autoComplete="off"
-            defaultValue={searchParams.get("query")?.toString()}
           />
         </div>
         <div className="flex gap-1 items-center justify-start md:justify-end flex-wrap w-full">

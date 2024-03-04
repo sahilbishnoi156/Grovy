@@ -1,8 +1,8 @@
 import { CardType, ColumnProps } from "@/typings";
 import React, { useState, DragEvent } from "react";
-import { Card } from "./Card";
+import { Card } from "./Card/Card";
 import { DropIndicator } from "./DropIndicator";
-import { AddCard } from "./AddCard";
+import { AddCard } from "./Card/AddCard";
 import { TaskDropDown } from "@/components/DropDown";
 import { useTaskStore } from "@/store/TaskStore";
 import { DeleteCategoryModal } from "../Modals/DeleteCategory";

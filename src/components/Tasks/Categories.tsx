@@ -74,6 +74,7 @@ export const Categories = ({
         description: doc.data().description,
         link: doc.data().link || undefined,
         file: doc.data().file || undefined,
+        ...(doc.data().timeBound && {timeBound: new Date(doc.data().timeBound?.seconds * 1000 ) || undefined} ),
         categoryId: doc.data().categoryId,
         timestamp: new Date(doc.data().timestamp?.seconds * 1000) || undefined,
       };
@@ -166,7 +167,7 @@ export const Categories = ({
                 return (
                   <div
                     key={`${category.id}${index}`}
-                    className="md:w-[22.7rem] w-full min-w-64 shrink-0 md:px-3 mb-6 dark:bg-neutral-900 bg-neutral-500 rounded-sm animate-pulse p-3 flex flex-col gap-3"
+                    className="md:w-[22.7rem] w-full min-w-64 shrink-0 md:px-3 mb-6 border  rounded-sm animate-pulse p-3 flex flex-col gap-3"
                   >
                     <div className="mb-3 flex items-center justify-between">
                       <h3 className={`font-medium`}>TITLE</h3>
@@ -187,7 +188,7 @@ export const Categories = ({
                             return (
                               <div
                                 key={`${card.id}${index}`}
-                                className="h-12 w-full dark:bg-neutral-800 bg-neutral-600 rounded-sm"
+                                className="h-12 w-full dark:bg-neutral-800 bg-neutral-300/50 hover:bg-neutral-300/70 hover:dark:bg-neutral-700/70 rounded-sm"
                               ></div>
                             );
                           }

@@ -11,11 +11,10 @@ import { useAppStore } from "@/store/store";
 import { FileType } from "@/typings";
 import React from "react";
 import { LuFiles } from "react-icons/lu";
-import { FaCheckCircle } from "react-icons/fa";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "@/firebase";
 import { useUser } from "@clerk/nextjs";
-import Spinner from "../Spinner";
+import Spinner from "../../../Spinner";
 import { Search } from "lucide-react";
 import _ from "lodash";
 
@@ -38,12 +37,11 @@ export function PickFile({ setFile, file }: any) {
   const [files, setFiles] = React.useState<FileType[]>([]);
   const [fetchingFiles, setFetchingFiles] = React.useState(false);
 
-  //* Search function 
+  //* Search function
   function debouncedSearch(term: string) {
     if (term) {
-      const searchedFiles = globalFiles.filter(
-        (file) =>
-          file.filename.toLowerCase().includes(term.toLowerCase())
+      const searchedFiles = globalFiles.filter((file) =>
+        file.filename.toLowerCase().includes(term.toLowerCase())
       );
       setFiles(searchedFiles);
     } else {
@@ -55,8 +53,8 @@ export function PickFile({ setFile, file }: any) {
   //* Fetch files only once
   React.useEffect(() => {
     const fetchFiles = async () => {
-      if(!user) return;
-      setFetchingFiles(true)
+      if (!user) return;
+      setFetchingFiles(true);
       try {
         const docResults = await getDocs(
           collection(db, "users", user.id!, "files")
@@ -65,7 +63,8 @@ export function PickFile({ setFile, file }: any) {
           id: doc.id,
           filename: doc.data().filename || doc.id,
           fullName: doc.data().fullName || doc.id,
-          timestamp: new Date(doc.data().timestamp?.seconds * 1000) || undefined,
+          timestamp:
+            new Date(doc.data().timestamp?.seconds * 1000) || undefined,
           downloadUrl: doc.data().downloadUrl,
           type: doc.data().type,
           size: doc.data().size,
@@ -74,8 +73,8 @@ export function PickFile({ setFile, file }: any) {
         setGlobalFiles(newDocs);
       } catch (error) {
         console.error(error);
-      } finally{
-        setFetchingFiles(false)
+      } finally {
+        setFetchingFiles(false);
       }
     };
     if (!files.length) {
@@ -86,8 +85,12 @@ export function PickFile({ setFile, file }: any) {
   return (
     <Dialog onOpenChange={(isOpen) => setIsOpen(isOpen)} open={isOpen}>
       <DialogTrigger asChild>
-        <Button type="button" variant={"outline"} size={"icon"}>
-          {file ? <FaCheckCircle size={15} /> : <LuFiles size={15} />}
+        <Button
+          type="button"
+          variant={file ? "default" : "outline"}
+          size={"icon"}
+        >
+           <LuFiles size={15} />
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">

@@ -7,7 +7,8 @@ export type CardType = {
   id: string;
   description: string;
   categoryId: string;
-  timestamp?: string | Date;
+  timestamp?: Date;
+  timeBound?: Date;
   link?: string;
   file?: string;
 };

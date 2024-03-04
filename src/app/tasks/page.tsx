@@ -40,6 +40,7 @@ export default async function pages() {
       description: doc.data().description || "TITLE",
       headingColor: doc.data().headingColor || "text-white",
       link: doc.data().link || undefined,
+      timeBound: new Date(doc.data().timeBound?.seconds * 1000),
       file: doc.data().file || undefined,
       categoryId: doc.data().categoryId || "uncategorized",
       timestamp: new Date(doc.data().timestamp?.seconds * 1000) || undefined,

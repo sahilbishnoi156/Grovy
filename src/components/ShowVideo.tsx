@@ -47,12 +47,6 @@ const VideoComponent = ({ videoSource, videoPlaceHolder }: any) => {
       {isLoading && (
         <>
           {videoPlaceHolder}
-          <div className=" inline-flex space-x-2 justify-center items-center h-12 absolute -left-[0.8px] z-50">
-            <span className="sr-only">Loading...</span>
-            <div className="h-1 w-1 bg-blue-500 rounded-full animate-bounce [animation-delay:-0.3s]"></div>
-            <div className="h-1 w-1 bg-blue-500 rounded-full animate-bounce [animation-delay:-0.15s]"></div>
-            <div className="h-1 w-1 bg-blue-500 rounded-full animate-bounce"></div>
-          </div>
         </>
       )}
       <video

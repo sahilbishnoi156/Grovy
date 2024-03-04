@@ -2,17 +2,19 @@ import { AddCardProps } from "@/typings";
 import { motion } from "framer-motion";
 import React, { FormEvent, useState } from "react";
 import { FiPlus } from "react-icons/fi";
-import { FaLink } from "react-icons/fa6";
 import { Button } from "@/components/ui/button";
 import { CgFormatUppercase } from "react-icons/cg";
-import { LuFiles } from "react-icons/lu";
-import { PickFile } from "../Modals/PickFiles";
-
+import { PickFile } from "./CardOptions/PickFiles";
+import { DatePicker } from "./CardOptions/DatePicker";
+import { AddLink } from "./CardOptions/AddLink";
+import { usePathname } from "next/navigation";
 export const AddCard = ({ id, setCards }: AddCardProps) => {
   const [text, setText] = useState("");
   const [link, setLink] = useState("");
   const [file, setFile] = useState("");
+  const [date, setDate] = React.useState<Date>();
   const [adding, setAdding] = useState(false);
+  const pathname = usePathname()
 
   const ref = React.useRef<HTMLTextAreaElement>(null);
 
@@ -20,20 +22,31 @@ export const AddCard = ({ id, setCards }: AddCardProps) => {
     e.preventDefault();
     if (!text.trim().length) return;
 
+    const dateObject = date instanceof Date ? new Date(date.getTime()) : null;
+
+    if (dateObject) {
+      dateObject.setHours(23, 59, 59, 0);
+    }
+
     const newCard = {
       id: Math.random().toString(),
       description: text.trim(),
       categoryId: id,
       ...(link?.trim()?.length && { link: link.trim() }),
-      ...(file?.trim()?.length && { file: `https://grovy.vercel.app/files?query=${file.trim()}` }),
+      ...(date && { timeBound: dateObject as Date }),
+      ...(file?.trim()?.length && {
+        file: `${pathname.split('/')[0]}/files?query=${file.trim()}`,
+      }),
     };
     setCards((pv) => [...pv, newCard]);
     setLink("");
     setText("");
     setFile("");
+    setDate(undefined)
     setAdding(false);
   };
 
+  //* Update text to uppercase and lowercase
   const updateInputText = () => {
     if (ref.current) {
       const start = ref.current.selectionStart;
@@ -47,7 +60,7 @@ export const AddCard = ({ id, setCards }: AddCardProps) => {
             selectedText.toUpperCase() +
             text.substring(end);
           setText(updatedText);
-        }else{
+        } else {
           const updatedText =
             text.substring(0, start) +
             selectedText.toLowerCase() +
@@ -76,9 +89,10 @@ export const AddCard = ({ id, setCards }: AddCardProps) => {
             placeholder="Add new task..."
             className="w-full rounded border border-violet-400 bg-violet-400/20 p-3 text-sm text-neutral-800 dark:text-neutral-50 placeholder-violet-300 focus:outline-0 outline-none"
           />
-
           <div className="flex gap-2 items-center">
-            <LinkComponent setLink={setLink} />
+            <AddLink setLink={setLink} link={link} />
+            <PickFile setFile={setFile} file={file} />
+            <DatePicker setDate={setDate} date={date} />
             <Button
               type="button"
               variant={"outline"}
@@ -87,7 +101,6 @@ export const AddCard = ({ id, setCards }: AddCardProps) => {
             >
               <CgFormatUppercase size={25} />
             </Button>
-            <PickFile setFile={setFile} file={file}/>
           </div>
           <div className="mt-1.5 flex items-center justify-end gap-1.5">
             <button
@@ -96,13 +109,14 @@ export const AddCard = ({ id, setCards }: AddCardProps) => {
             >
               Close
             </button>
-            <button
+            <Button
               type="submit"
-              className="flex items-center gap-1.5 rounded bg-neutral-50 px-3 py-1.5 text-xs text-neutral-950 transition-colors hover:bg-neutral-300"
+              size={'xs'}
+              className="text-xs"
             >
               <span>Add</span>
               <FiPlus />
-            </button>
+            </Button>
           </div>
         </motion.form>
       ) : (
@@ -115,41 +129,6 @@ export const AddCard = ({ id, setCards }: AddCardProps) => {
           <FiPlus className="group-hover:rotate-90 duration-300" />
         </motion.button>
       )}
-    </>
-  );
-};
-
-const LinkComponent = ({ setLink }: any) => {
-  const [showLink, setShowLink] = useState(false);
-  return (
-    <>
-      <label htmlFor="voice-search" className="sr-only">
-        Search
-      </label>
-      <div className="relative group">
-        <div
-          className="absolute inset-y-0 start-0 flex items-center ps-3 h-full w-10 rounded-md cursor-pointer z-[1]"
-          onClick={() => setShowLink(!showLink)}
-        />
-        <div className="absolute inset-y-0 start-0 flex items-center ps-3">
-          <FaLink />
-        </div>
-        <input
-          type="text"
-          id="voice-search"
-          className={`bg-transparent border text-gray-900 text-sm rounded-lg block p-2.5 dark:text-white duration-200 ${
-            !showLink
-              ? "w-10 ps-4 placeholder:text-transparent group-hover:bg-neutral-800"
-              : "ps-10 w-fit"
-          } `}
-          placeholder="Link"
-          autoFocus
-          autoComplete="off"
-          disabled={!showLink}
-          onChange={(e) => setLink(e.target.value)}
-          required={showLink}
-        />
-      </div>
     </>
   );
 };
