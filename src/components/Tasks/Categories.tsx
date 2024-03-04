@@ -108,7 +108,7 @@ export const Categories = ({
           });
         }
       }
-      
+
       // Update Changed Cards
       const changedCards = categoryChangedCards();
       for (const changedCard of changedCards) {
@@ -166,7 +166,7 @@ export const Categories = ({
                 return (
                   <div
                     key={`${category.id}${index}`}
-                    className="min-h-12 w-96 dark:bg-neutral-900 bg-neutral-500 rounded-sm animate-pulse p-3 flex flex-col gap-3"
+                    className="md:w-[22.7rem] w-full min-w-64 shrink-0 md:px-3 mb-6 dark:bg-neutral-900 bg-neutral-500 rounded-sm animate-pulse p-3 flex flex-col gap-3"
                   >
                     <div className="mb-3 flex items-center justify-between">
                       <h3 className={`font-medium`}>TITLE</h3>
@@ -207,7 +207,11 @@ export const Categories = ({
 
   //! Main Content
   return (
-    <div className={`p-3 flex flex-col ${isSaving && "touch-none pointer-events-none"}`}>
+    <div
+      className={`p-3 flex flex-col ${
+        isSaving && "touch-none pointer-events-none"
+      }`}
+    >
       <div className="mt-4 md:mt-0">
         <AddCategory />
       </div>

@@ -173,7 +173,7 @@ export const Column = ({
   };
 
   return (
-    <div className="md:w-96 w-full min-w-64 shrink-0 md:px-3 mb-6">
+    <div className="md:w-[23rem] w-full min-w-64 shrink-0 md:px-3 mb-6" >
       <div className="mb-3 flex items-center justify-between">
         <h3 className={`font-medium ${headingColor}`}>
           {title}{" "}

@@ -28,8 +28,8 @@ class ErrorBoundary extends Component<
     if (this.state.hasError) {
       // Render a fallback UI when an error occurs
       return (
-        <div className="min-h-[90vh] flex items-center justify-center">
-          <h1>Something Went Wrong</h1>
+        <div className="min-h-[90vh] flex items-center justify-center flex-col gap-2">
+          <h1 className="text-3xl text-red-500">Something Went Wrong</h1>
           <p>Please refresh or try again later</p>
         </div>
       );

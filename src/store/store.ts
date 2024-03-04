@@ -1,6 +1,10 @@
 import { FileType } from "@/typings";
 import { create } from "zustand";
 
+type ShareFilesType = {
+  id: string,
+  filename: string,
+}
 interface AppState {
   isDeletingModalOpen: boolean;
   setIsDeletingModalOpen: (open: boolean) => void;

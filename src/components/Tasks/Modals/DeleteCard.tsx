@@ -1,13 +1,16 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
 import { db } from "@/firebase";
 import { useTaskStore } from "@/store/TaskStore";
 import { CardType } from "@/typings";
@@ -17,17 +20,17 @@ import React from "react";
 import { toast } from "sonner";
 
 export function DeleteCardModal() {
-  const { user } = useUser();
+   const { user } = useUser();
+
+  //* Local state
+  const [isDeleting, setIsDeleting] = React.useState(false)
 
   //* Global State
   const [isDeleteCardOpen, setIsDeleteCardOpen, cardId] = useTaskStore(
     (state) => [state.isDeleteCardOpen, state.setIsDeleteCardOpen, state.cardId]
   );
 
-  //* Local State
-  const [isDeleting, setIsDeleting] = React.useState(false)
-
-  const handleDeleteCard = async () => {
+   const handleDeleteCard = async () => {
     setIsDeleting(true)
     const promise = async () => {
       if (!user || !cardId) return;
@@ -51,34 +54,23 @@ export function DeleteCardModal() {
   };
 
   return (
-    <Dialog
-      open={isDeleteCardOpen}
-      onOpenChange={(isOpen) => {
-        setIsDeleteCardOpen(isOpen);
-      }}
-    >
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle className="text-red-400">Ohoooooo!</DialogTitle>
-          <DialogDescription>
-            Are you really deleting this task? This action cannot be undone.
-          </DialogDescription>
-        </DialogHeader>
-        <DialogFooter className="sm:justify-start">
-          <Button
-            type="button"
-            variant="ghost"
-            onClick={() => setIsDeleteCardOpen(false)}
-          >
-            <span className="sr-only">Close</span>
-            <span>Close</span>
-          </Button>
+    <AlertDialog open={isDeleteCardOpen} onOpenChange={(isOpen)=>setIsDeleteCardOpen(isOpen)}>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle className="text-red-400">Ohooooo!</AlertDialogTitle>
+          <AlertDialogDescription>
+            Are you really deleting this card? This will permanently delete your
+            card.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Cancel</AlertDialogCancel>
           <Button type="button" variant="danger" onClick={handleDeleteCard} disabled={isDeleting}>
             <span className="sr-only">Delete</span>
             <span>Delete</span>
           </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
-  );
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  )
 }

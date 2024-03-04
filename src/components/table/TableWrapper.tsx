@@ -142,15 +142,10 @@ export default function TableWrapper({ skeletons }: { skeletons: FileType[] }) {
   if (docs?.docs.length === undefined) {
     return (
       <div className="flex flex-col space-y-5 pb-10">
-        <div className="flex items-center justify-between">
-          <div className="flex gap-4 items-center">
+        <div className="flex gap-4 items-center">
             <h2 className="font-bold ml-2 ">My Files</h2>
           </div>
-          <div className="flex gap-4 items-center ">
-            <Button variant={"outline"} className="w-36 h-12 mb-5"></Button>
-            <Button variant={"outline"} className="w-36 h-12 mb-5"></Button>
-          </div>
-        </div>
+        <div className="flex items-center justify-between mb-5">
         <div className="relative dark:text-white text-black bg-transparent w-full">
           <span className="absolute inset-y-0 left-0 flex items-center pl-2">
             <Search size={18} />
@@ -164,6 +159,12 @@ export default function TableWrapper({ skeletons }: { skeletons: FileType[] }) {
             autoComplete="off"
           />
         </div>
+          <div className="flex gap-4 items-center ">
+            <Button variant={"outline"} className="w-36 h-10 "></Button>
+            <Button variant={"outline"} className="w-36 h-10 "></Button>
+          </div>
+        </div>
+        
         <div className="border rounded-lg">
           <div className="border-b h-12"></div>
           {skeletons.slice(0, 3).map((file: FileType) => {

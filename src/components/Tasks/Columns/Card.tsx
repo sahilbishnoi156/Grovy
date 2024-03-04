@@ -6,6 +6,8 @@ import { useTaskStore } from "@/store/TaskStore";
 import { DeleteCardModal } from "../Modals/DeleteCard";
 import { FaLink } from "react-icons/fa6";
 import { LuFiles } from "react-icons/lu";
+import Link from "next/link";
+import { Trash } from "lucide-react";
 
 export const Card = ({
   description,
@@ -36,26 +38,28 @@ export const Card = ({
             : "dark:border-purple-400/40 border-purple-500 shadow-lg shadow-black/30"
         }`}
       >
-        {(link || file) && <div className="inline-block">
-          {link && (
-            <a
-              href={link || "/"}
-              className="hover:text-blue-500 text-neutral-500 cursor-pointer inline-block mr-2"
-              target="_blank"
-            >
-              <FaLink size={17} />
-            </a>
-          )}
-          {file && (
-            <a
-              href={file || "/"}
-              className="hover:text-blue-500 text-neutral-500 cursor-pointer inline-block"
-              target="_blank"
-            >
-              <LuFiles size={17} />
-            </a>
-          )}
-        </div>}
+        {(link || file) && (
+          <div className="inline-block">
+            {link && (
+              <a
+                href={link || "/"}
+                className="hover:text-blue-500 text-neutral-500 cursor-pointer inline-block mr-2"
+                target="_blank"
+              >
+                <FaLink size={17} />
+              </a>
+            )}
+            {file && (
+              <Link
+                href={file || "/"}
+                className="hover:text-blue-500 text-neutral-500 cursor-pointer inline-block"
+                target="_blank"
+              >
+                <LuFiles size={17} />
+              </Link>
+            )}
+          </div>
+        )}
         <p className="text-sm text-neutral-100">{description}</p>
       </motion.div>
     </div>
