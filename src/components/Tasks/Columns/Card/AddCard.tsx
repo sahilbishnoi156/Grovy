@@ -12,9 +12,9 @@ export const AddCard = ({ id, setCards }: AddCardProps) => {
   const [text, setText] = useState("");
   const [link, setLink] = useState("");
   const [file, setFile] = useState("");
-  const [date, setDate] = React.useState<Date>();
+  const [date, setDate] = React.useState<Date | null>();
   const [adding, setAdding] = useState(false);
-  const pathname = usePathname()
+  const pathname = usePathname();
 
   const ref = React.useRef<HTMLTextAreaElement>(null);
 
@@ -22,27 +22,21 @@ export const AddCard = ({ id, setCards }: AddCardProps) => {
     e.preventDefault();
     if (!text.trim().length) return;
 
-    const dateObject = date instanceof Date ? new Date(date.getTime()) : null;
-
-    if (dateObject) {
-      dateObject.setHours(23, 59, 59, 0);
-    }
-
     const newCard = {
       id: Math.random().toString(),
       description: text.trim(),
       categoryId: id,
       ...(link?.trim()?.length && { link: link.trim() }),
-      ...(date && { timeBound: dateObject as Date }),
+      ...(date && { timeBound: date }),
       ...(file?.trim()?.length && {
-        file: `${pathname.split('/')[0]}/files?query=${file.trim()}`,
+        file: `${pathname.split("/")[0]}/files?query=${file.trim()}`,
       }),
     };
     setCards((pv) => [...pv, newCard]);
     setLink("");
     setText("");
     setFile("");
-    setDate(undefined)
+    setDate(undefined);
     setAdding(false);
   };
 
@@ -92,7 +86,16 @@ export const AddCard = ({ id, setCards }: AddCardProps) => {
           <div className="flex gap-2 items-center">
             <AddLink setLink={setLink} link={link} />
             <PickFile setFile={setFile} file={file} />
-            <DatePicker setDate={setDate} date={date} />
+            {/* <DatePicker setDate={setDate} date={date} /> */}
+            <DatePicker
+              value={{
+                date: date,
+                hasTime: true,
+              }}
+              onChange={(e) => {
+                setDate(e.date);
+              }}
+            />
             <Button
               type="button"
               variant={"outline"}
@@ -109,11 +112,7 @@ export const AddCard = ({ id, setCards }: AddCardProps) => {
             >
               Close
             </button>
-            <Button
-              type="submit"
-              size={'xs'}
-              className="text-xs"
-            >
+            <Button type="submit" size={"xs"} className="text-xs">
               <span>Add</span>
               <FiPlus />
             </Button>

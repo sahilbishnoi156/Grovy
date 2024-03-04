@@ -50,7 +50,7 @@ const ShowTimeDifference = ({ timeBound, timestamp, setCardStyle }: any) => {
     const padZero = (value: number) => (value < 10 ? `0${value}` : value);
     const seconds = Math.floor((time.getTime() / 1000) % 60);
     const minutes = Math.floor((time.getTime() / 1000 / 60) % 60);
-    const hours = (Math.floor((time.getTime() / (1000 * 60 * 60)) % 24)) % 12 || null;
+    const hours = (Math.floor((time.getTime() / (1000 * 60 * 60)) % 24)) % 24 || null;
     const days = Math.floor(time.getTime() / (1000 * 60 * 60 * 24));
 
     const formattedDays = (days > 0 ? `${days}d ` : "")
