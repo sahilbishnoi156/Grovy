@@ -11,6 +11,7 @@ type State = {
   isDeleteCategoryOpen: boolean;
   isRenameCategoryOpen: boolean;
   isCardOptionsOpen: boolean;
+  isEditable: boolean;
 };
 
 type Action = {
@@ -24,6 +25,7 @@ type Action = {
   setCategoryName: (categoryName: string) => void;
   setCategoryColor: (categoryColor: string) => void;
   setCard: (card: CardType) => void;
+  setIsEditable: (isEditable: boolean) => void;
 };
 
 export const useTaskStore = create<State & Action>()((set) => ({
@@ -70,4 +72,7 @@ export const useTaskStore = create<State & Action>()((set) => ({
 
   card: null,
   setCard: (card: CardType ) => set(() => ({ card: card })),
+
+  isEditable: false,
+  setIsEditable: (isEditable: boolean) => set(() => ({ isEditable: isEditable}))
 }));

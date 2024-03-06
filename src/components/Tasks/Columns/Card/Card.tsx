@@ -1,7 +1,7 @@
 import { CardProps } from "@/typings";
 import React from "react";
 import { DropIndicator } from "../DropIndicator";
-import { motion } from "framer-motion";
+import { motion, useMotionValue, useSpring } from "framer-motion";
 import { useTaskStore } from "@/store/TaskStore";
 import { CardOptionsModal } from "../../Modals/CardOptions";
 import { FaLink } from "react-icons/fa6";
@@ -9,6 +9,7 @@ import { LuFiles } from "react-icons/lu";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import ShowTimeDifference from "./ShowTimeDifference";
+import { PenIcon } from "lucide-react";
 
 export const Card = ({
   description,
@@ -21,25 +22,54 @@ export const Card = ({
   handleDragStart,
 }: CardProps) => {
   const [cardStyle, setCardStyle] = React.useState("");
+  const [originalX, setOriginalX] = React.useState(0);
+  const x = useMotionValue(0);
 
+  const handleTouchMove = (event: any) => {
+    // Calculate the new x position based on touch movement
+    const newX = event.touches[0].clientX - originalX;
+
+    // Limit movement to 100px to the left
+    if (newX < -100) {
+      x.set(-100);
+    } else if (newX > 0) {
+      x.set(0);
+    } else {
+      x.set(newX);
+    }
+  };
+
+  const OpenModal = () =>{
+    if (id) {
+      useTaskStore.setState({
+        card: {
+          id: id,
+          categoryId: categoryId,
+          link: link,
+          file: file,
+          description: description,
+          timeBound: timeBound,
+          timestamp: timestamp,
+        },
+      });
+    }
+    useTaskStore.setState({ isCardOptionsOpen: true });
+  }
   return (
-    <div
-      onDoubleClick={(event) => {
-        if(id){
-          useTaskStore.setState({
-            card: {
-              id: id,
-              categoryId: categoryId,
-              link: link,
-              file: file,
-              description: description,
-              timeBound: timeBound,
-              timestamp: timestamp,
-            },
-          });
-        }
-        useTaskStore.setState({ isCardOptionsOpen: true });
+    <motion.div
+      onTouchStart={(event) => {
+        setOriginalX(event.touches[0].clientX);
       }}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={() => {
+        if (x.get() <= -100) {
+          OpenModal();
+        }
+        x.set(0)
+      }}
+      style={{ x:x }}
+      onDoubleClick={OpenModal}
+      className="dur duration-150 relative"
     >
       <CardOptionsModal />
       <DropIndicator beforeId={id} id={categoryId} />
@@ -72,7 +102,9 @@ export const Card = ({
                 setCardStyle={setCardStyle}
               />
             )}
-            {timeBound?.isCompleted && <div className="text-green-400 text-xs">Completed</div>}
+            {timeBound?.isCompleted && (
+              <div className="text-green-400 text-xs">Completed</div>
+            )}
             {link && (
               <a
                 href={link || "/"}
@@ -93,6 +125,6 @@ export const Card = ({
           </div>
         )}
       </motion.div>
-    </div>
+    </motion.div>
   );
 };

@@ -41,7 +41,7 @@ import { DatePicker } from "../Columns/Card/CardOptions/DatePicker";
 import { PickFile } from "../Columns/Card/CardOptions/PickFiles";
 import { AddLink } from "../Columns/Card/CardOptions/AddLink";
 import { usePathname } from "next/navigation";
-import { CheckCheck, Trash } from "lucide-react";
+import { CheckCheck, Save, Trash, Trash2, X } from "lucide-react";
 import { pickBy, identity } from "lodash";
 import { Toggle } from "@/components/ui/toggle";
 
@@ -53,9 +53,13 @@ export function CardOptionsModal() {
   const [isUpdating, setIsUpdating] = React.useState(false);
 
   //* Global State
-  const [isCardOptionsOpen, setIsCardOptionsOpen, card] = useTaskStore(
-    (state) => [state.isCardOptionsOpen, state.setIsCardOptionsOpen, state.card]
-  );
+  const [isCardOptionsOpen, setIsCardOptionsOpen, card, isEditable] =
+    useTaskStore((state) => [
+      state.isCardOptionsOpen,
+      state.setIsCardOptionsOpen,
+      state.card,
+      state.isEditable,
+    ]);
 
   const handleDeleteCard = async () => {
     setIsUpdating(true);
@@ -91,9 +95,11 @@ export function CardOptionsModal() {
         await setDoc(doc(db, "users", user.id, "cards", card.id), {
           ...newCard,
           timeBound: {
-            start: card.timeBound?.start,
-            end: card.timeBound?.isCompleted ? null  : card.timeBound?.end,
-            isCompleted: card.timeBound?.isCompleted
+            start: card.timeBound?.start || null,
+            end: card.timeBound?.isCompleted
+              ? null
+              : card.timeBound?.end || null,
+            isCompleted: card.timeBound?.isCompleted || false,
           },
         });
       } catch (error) {
@@ -116,7 +122,10 @@ export function CardOptionsModal() {
     return (
       <Dialog
         open={isCardOptionsOpen}
-        onOpenChange={(isOpen) => setIsCardOptionsOpen(isOpen)}
+        onOpenChange={(isOpen) => {
+          useTaskStore.setState({ isEditable: false });
+          setIsCardOptionsOpen(isOpen);
+        }}
       >
         <DialogContent
           className="sm:max-w-[425px]"
@@ -155,7 +164,7 @@ export function CardOptionsModal() {
               <Button
                 type="button"
                 variant={"sucess"}
-                disabled={isUpdating}
+                disabled={isUpdating || !isEditable}
                 onClick={handleSaveDocument}
               >
                 Save
@@ -170,13 +179,16 @@ export function CardOptionsModal() {
   return (
     <Drawer
       open={isCardOptionsOpen}
-      onOpenChange={(isOpen) => setIsCardOptionsOpen(isOpen)}
+      onOpenChange={(isOpen) => {
+        useTaskStore.setState({ isEditable: false });
+        setIsCardOptionsOpen(isOpen);
+      }}
     >
       <DrawerContent>
         <DrawerHeader className="text-left">
-          <DrawerTitle>Edit profile</DrawerTitle>
+          <DrawerTitle>Edit Task</DrawerTitle>
           <DrawerDescription>
-            Make changes to your profile here. Click save when you are done.
+            Make changes to your task here. Click save when you are done.
           </DrawerDescription>
         </DrawerHeader>
         <ProfileForm
@@ -185,30 +197,35 @@ export function CardOptionsModal() {
           isUpdating={isUpdating}
           handleSaveDocument={handleSaveDocument}
         />
-        <DialogFooter className="p-4">
+        <DialogFooter className="p-4 gap-3">
           <Button
             type="button"
-            variant={"ghost"}
+            variant={"outline"}
             disabled={isUpdating}
             className="hover:text-red-600 gap-2"
             onClick={handleDeleteCard}
           >
+            <Trash2 />
             Remove
           </Button>
           <Button
             type="button"
             disabled={isUpdating}
-            variant={"ghost"}
+            variant={"outline"}
+            className="gap-2"
             onClick={() => setIsCardOptionsOpen(false)}
           >
-            Cancel
+            <X />
+            Close
           </Button>
           <Button
             type="button"
             variant={"sucess"}
-            disabled={isUpdating}
+            disabled={isUpdating || !isEditable}
+            className="gap-2"
             onClick={handleSaveDocument}
           >
+            <Save />
             Save
           </Button>
         </DialogFooter>
@@ -226,20 +243,22 @@ function ProfileForm({ className, card }: any) {
           type="text"
           id="description"
           defaultValue={card.description}
-          onChange={(e) =>
+          onChange={(e) => {
+            useTaskStore.setState({ isEditable: true });
             useTaskStore.setState({
               card: {
                 ...card,
                 description: e.target.value,
               },
-            })
-          }
+            });
+          }}
         />
       </div>
       <div className="flex gap-4">
         <AddLink
           link={card.link}
           setLink={(value: string) => {
+            useTaskStore.setState({ isEditable: true });
             useTaskStore.setState({
               card: {
                 ...card,
@@ -251,6 +270,7 @@ function ProfileForm({ className, card }: any) {
         <PickFile
           file={card.file}
           setFile={(value: string) => {
+            useTaskStore.setState({ isEditable: true });
             if (
               card.file &&
               value === new URL(card.file).searchParams.get("query")
@@ -274,6 +294,7 @@ function ProfileForm({ className, card }: any) {
         <DatePicker
           value={{ date: card?.timeBound?.end || undefined }}
           onChange={(value) => {
+            useTaskStore.setState({ isEditable: true });
             useTaskStore.setState({
               card: {
                 ...card,
@@ -288,27 +309,29 @@ function ProfileForm({ className, card }: any) {
             });
           }}
         />
-        {card.timeBound?.end && (card.timeBound.end.getTime() > new Date().getTime()) && (
-          <Button
-            variant={card.timeBound?.isCompleted ? "default" : "outline"}
-            size={"icon"}
-            type="button"
-            onClick={(v) =>{
-              useTaskStore.setState({
-                card: {
-                  ...card,
-                  timeBound: {
-                    isCompleted: !card.timeBound?.isCompleted,
-                    start: card.timeBound?.start,
-                    end: card.timeBound?.end
+        {card.timeBound?.end &&
+          card.timeBound.end.getTime() > new Date().getTime() && (
+            <Button
+              variant={card.timeBound?.isCompleted ? "default" : "outline"}
+              size={"icon"}
+              type="button"
+              onClick={(v) => {
+                useTaskStore.setState({ isEditable: true });
+                useTaskStore.setState({
+                  card: {
+                    ...card,
+                    timeBound: {
+                      isCompleted: !card.timeBound?.isCompleted,
+                      start: card.timeBound?.start,
+                      end: card.timeBound?.end,
+                    },
                   },
-                },
-              })
-            }}
-          >
-            <CheckCheck />
-          </Button>
-        )}
+                });
+              }}
+            >
+              <CheckCheck />
+            </Button>
+          )}
       </div>
     </div>
   );
