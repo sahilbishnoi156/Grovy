@@ -26,6 +26,7 @@ export const AddLink = ({ setLink, link }: any) => {
             } `}
             placeholder="Link"
             autoFocus
+            defaultValue={link}
             autoComplete="off"
             disabled={!showLink}
             onChange={(e) => setLink(e.target.value)}

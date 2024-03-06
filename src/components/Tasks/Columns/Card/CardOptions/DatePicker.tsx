@@ -65,14 +65,10 @@ function DateSegment({ segment, state }: DateSegmentProps) {
 }
 
 function TimeField({
-  hasTime,
-  onHasTimeChange,
   disabled,
   ...props
 }: {
   disabled: boolean;
-  hasTime: boolean;
-  onHasTimeChange: (hasTime: boolean) => void;
   value: TimeValue | null;
   onChange: (value: TimeValue) => void;
 }) {
@@ -93,27 +89,14 @@ function TimeField({
         disabled ? "cursor-not-allowed opacity-70" : ""
       )}
     >
-      <Toggle
-        disabled={disabled}
-        pressed={hasTime}
-        onPressedChange={onHasTimeChange}
-        size="sm"
-        variant="outline"
-        aria-label="Toggle time"
-        className="h-10 px-3"
+      <div
+        ref={ref}
+        className="inline-flex h-10 w-full flex-1 rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
       >
-        <ClockIcon size="16px" />
-      </Toggle>
-      {hasTime && (
-        <div
-          ref={ref}
-          className="inline-flex h-10 w-full flex-1 rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-        >
-          {state.segments.map((segment, i) => (
-            <DateSegment key={i} segment={segment} state={state} />
-          ))}
-        </div>
-      )}
+        {state.segments.map((segment, i) => (
+          <DateSegment key={i} segment={segment} state={state} />
+        ))}
+      </div>
     </div>
   );
 }
@@ -139,27 +122,25 @@ const dateToCalendarDateTime = (date: Date): CalendarDateTime => {
 };
 
 type DatePickerProps = {
-  value?: { date?: Date | null; hasTime: boolean };
-  onChange: (value: { date: Date | null; hasTime: boolean }) => void;
+  value?: { date?: Date | null; };
+  onChange: (value: { date: Date | null;  }) => void;
   isDisabled?: boolean;
 };
 const DatePicker = (props: DatePickerProps) => {
   const contentRef = useRef<HTMLDivElement | null>(null);
 
   const [open, setOpen] = useState(false);
-  const hasTime = props.value?.hasTime || false;
 
-  const onChangeWrapper = (value: DateValue, newHasTime?: boolean) => {
+  const onChangeWrapper = (value: DateValue) => {
     const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
     props.onChange({
       date: value.toDate(timeZone),
-      hasTime: newHasTime ?? hasTime,
     });
   };
   const datePickerProps: DatePickerStateOptions<CalendarDateTime> = {
     value: props.value?.date
       ? dateToCalendarDateTime(props.value.date)
-      : undefined,
+      : null,
     onChange: onChangeWrapper,
     isDisabled: props.isDisabled,
     granularity: "minute",
@@ -187,8 +168,9 @@ const DatePicker = (props: DatePickerProps) => {
         <Select
           onValueChange={(value) => {
             props.onChange({
-              date: new Date(addDays(new Date(), parseInt(value)).setHours(0,0,0,0)),
-              hasTime: hasTime,
+              date: new Date(
+                addDays(new Date(), parseInt(value)).setHours(0, 0, 0, 0)
+              ),
             });
             setOpen(true);
           }}
@@ -213,7 +195,6 @@ const DatePicker = (props: DatePickerProps) => {
             } else {
               props.onChange({
                 date: null,
-                hasTime: hasTime,
               });
             }
           }}
@@ -221,16 +202,9 @@ const DatePicker = (props: DatePickerProps) => {
           footer={
             <TimeField
               aria-label="Time Picker"
-              disabled={!props.value?.date}
-              hasTime={hasTime}
-              onHasTimeChange={(newHasTime) =>
-                onChangeWrapper(
-                  dateToCalendarDateTime(props.value?.date!),
-                  newHasTime
-                )
-              }
-              value={hasTime ? state.timeValue : null}
+              value={state.timeValue}
               onChange={state.setTimeValue}
+              disabled={!props.value?.date}
             />
           }
         />

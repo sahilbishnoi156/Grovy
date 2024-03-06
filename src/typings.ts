@@ -1,4 +1,6 @@
+import { Timestamp } from "firebase/firestore";
 import { Dispatch, MouseEventHandler, SetStateAction } from "react";
+import { FieldValue } from "react-hook-form";
 import { z } from "zod";
 
 export type ColumnType = "backlog" | "todo" | "doing" | "done";
@@ -8,7 +10,11 @@ export type CardType = {
   description: string;
   categoryId: string;
   timestamp?: Date;
-  timeBound?: Date;
+  timeBound?: {
+    start: Timestamp,
+    end: Date,
+    isCompleted: boolean
+  };
   link?: string;
   file?: string;
 };

@@ -3,7 +3,7 @@ import React from "react";
 import { DropIndicator } from "../DropIndicator";
 import { motion } from "framer-motion";
 import { useTaskStore } from "@/store/TaskStore";
-import { DeleteCardModal } from "../../Modals/DeleteCard";
+import { CardOptionsModal } from "../../Modals/CardOptions";
 import { FaLink } from "react-icons/fa6";
 import { LuFiles } from "react-icons/lu";
 import Link from "next/link";
@@ -20,16 +20,28 @@ export const Card = ({
   file,
   handleDragStart,
 }: CardProps) => {
-  const [cardStyle, setCardStyle] = React.useState('')
+  const [cardStyle, setCardStyle] = React.useState("");
 
   return (
     <div
-      onDoubleClick={() => {
-        useTaskStore.setState({ cardId: id });
-        useTaskStore.setState({ isDeleteCardOpen: true });
+      onDoubleClick={(event) => {
+        if(id){
+          useTaskStore.setState({
+            card: {
+              id: id,
+              categoryId: categoryId,
+              link: link,
+              file: file,
+              description: description,
+              timeBound: timeBound,
+              timestamp: timestamp,
+            },
+          });
+        }
+        useTaskStore.setState({ isCardOptionsOpen: true });
       }}
     >
-      <DeleteCardModal />
+      <CardOptionsModal />
       <DropIndicator beforeId={id} id={categoryId} />
       <motion.div
         layout
@@ -54,13 +66,13 @@ export const Card = ({
         </p>
         {(link || file || timeBound) && (
           <div className="flex items-center gap-2 mt-[2px]">
-            {timeBound && (
+            {timeBound?.end && (
               <ShowTimeDifference
-                timeBound={timeBound}
-                timestamp={timestamp}
+                completeTime={timeBound}
                 setCardStyle={setCardStyle}
               />
             )}
+            {timeBound?.isCompleted && <div className="text-green-400 text-xs">Completed</div>}
             {link && (
               <a
                 href={link || "/"}

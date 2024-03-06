@@ -82,6 +82,14 @@ export function PickFile({ setFile, file }: any) {
     }
   }, [files, setGlobalFiles, user]);
 
+  function isURL(str: string) {
+    // Regular expression for a URL
+    var urlRegex = /^(ftp|http|https):\/\/[^ "]+$/;
+  
+    // Test the string against the regular expression
+    return urlRegex.test(str);
+  }
+
   return (
     <Dialog onOpenChange={(isOpen) => setIsOpen(isOpen)} open={isOpen}>
       <DialogTrigger asChild>
@@ -110,7 +118,7 @@ export function PickFile({ setFile, file }: any) {
             return (
               <Button
                 key={card.id}
-                variant={card.filename === file ? "secondary" : "ghost"}
+                variant={card.filename === (isURL(file) ? new URL(file).searchParams.get("query") : file) ? "default" : "ghost"}
                 className="justify-start"
                 onClick={() => {
                   setFile(card.filename);

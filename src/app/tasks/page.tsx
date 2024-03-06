@@ -1,7 +1,7 @@
 import React from "react";
 import { Categories } from "@/components/Tasks/Categories";
 import { auth } from "@clerk/nextjs";
-import { collection, getDocs, orderBy, query } from "firebase/firestore";
+import { Timestamp, collection, getDocs, orderBy, query } from "firebase/firestore";
 import { db } from "@/firebase";
 import { CardType, CategoryType } from "@/typings";
 import ErrorBoundary from "@/components/ErroBoundry";
@@ -39,11 +39,7 @@ export default async function pages() {
       id: doc.id,
       description: doc.data().description || "TITLE",
       headingColor: doc.data().headingColor || "text-white",
-      link: doc.data().link || undefined,
-      timeBound: new Date(doc.data().timeBound?.seconds * 1000),
-      file: doc.data().file || undefined,
       categoryId: doc.data().categoryId || "uncategorized",
-      timestamp: new Date(doc.data().timestamp?.seconds * 1000) || undefined,
     })) || [];
   return (
     <ErrorBoundary>

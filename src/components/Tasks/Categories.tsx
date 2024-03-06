@@ -74,7 +74,11 @@ export const Categories = ({
         description: doc.data().description,
         link: doc.data().link || undefined,
         file: doc.data().file || undefined,
-        ...(doc.data().timeBound && {timeBound: new Date(doc.data().timeBound?.seconds * 1000 ) || undefined} ),
+        ...(doc.data().timeBound && {timeBound: {
+          start: new Date(doc.data().timeBound.start?.seconds * 1000 ),
+          end: doc.data().timeBound?.end ? new Date(doc.data().timeBound.end?.seconds * 1000 ) : undefined,
+          isCompleted: doc.data().timeBound.isCompleted
+        } || undefined} ),
         categoryId: doc.data().categoryId,
         timestamp: new Date(doc.data().timestamp?.seconds * 1000) || undefined,
       };

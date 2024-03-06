@@ -8,6 +8,7 @@ import { PickFile } from "./CardOptions/PickFiles";
 import { DatePicker } from "./CardOptions/DatePicker";
 import { AddLink } from "./CardOptions/AddLink";
 import { usePathname } from "next/navigation";
+import { Timestamp, serverTimestamp } from "firebase/firestore";
 export const AddCard = ({ id, setCards }: AddCardProps) => {
   const [text, setText] = useState("");
   const [link, setLink] = useState("");
@@ -27,7 +28,7 @@ export const AddCard = ({ id, setCards }: AddCardProps) => {
       description: text.trim(),
       categoryId: id,
       ...(link?.trim()?.length && { link: link.trim() }),
-      ...(date && { timeBound: date }),
+      ...(date && { timeBound: {start: serverTimestamp() as Timestamp, end:date, isCompleted: false } }),
       ...(file?.trim()?.length && {
         file: `${pathname.split("/")[0]}/files?query=${file.trim()}`,
       }),
@@ -90,7 +91,6 @@ export const AddCard = ({ id, setCards }: AddCardProps) => {
             <DatePicker
               value={{
                 date: date,
-                hasTime: true,
               }}
               onChange={(e) => {
                 setDate(e.date);
