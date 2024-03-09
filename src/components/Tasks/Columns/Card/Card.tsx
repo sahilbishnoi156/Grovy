@@ -53,7 +53,9 @@ export const Card = ({
         },
       });
     }
-    useTaskStore.setState({ isCardOptionsOpen: true });
+    if(!useTaskStore.getState().isCardOptionsOpen){
+      useTaskStore.setState({ isCardOptionsOpen: true });
+    }
   }
   return (
     <motion.div

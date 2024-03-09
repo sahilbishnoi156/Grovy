@@ -69,7 +69,7 @@ export function HamburgerIcon() {
           <div className="flex items-center justify-start gap-1 text-xs text-neutral-400">
             Last updated: 
             <Calendar size={13} />
-            <span>3/4/2024</span>
+            <span>03/09/2024</span>
             <span className="sr-only">Last updated time</span>
           </div>
         </div>

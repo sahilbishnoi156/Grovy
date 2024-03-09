@@ -1,5 +1,4 @@
 // "use client"
-import MovableDiv from "@/components/MovableDiv";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import React from "react";
@@ -12,7 +11,6 @@ export default function Home() {
       <div className="flex w-full lg:flex-row flex-col-reverse">
         <div className="lg:w-2/5 w-full flex flex-col items-start justify-center px-2 lg:px-16">
           <h1 className="text-6xl -ml-1">Grovy</h1>
-          <MovableDiv/>
           <h3 className="text-2xl">My Personal library</h3>
           <p className="text-neutral-500 mt-8">
             Lorem ipsum dolor sit amet consectetur adipisicing elit. Assumenda
