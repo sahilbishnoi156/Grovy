@@ -93,7 +93,7 @@ export const Card = ({
           }
         )}
       >
-        <p className="text-sm text-neutral-900 dark:text-white">
+        <p className="text-sm text-neutral-900 dark:text-white whitespace-pre-wrap">
           {description}
         </p>
         {(link || file || timeBound) && (

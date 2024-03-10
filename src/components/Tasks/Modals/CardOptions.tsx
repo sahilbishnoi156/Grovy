@@ -107,6 +107,7 @@ export function CardOptionsModal() {
       } finally {
         setIsUpdating(false);
         setIsCardOptionsOpen(false);
+        useTaskStore.setState({isEditable: false})
       }
     };
     toast.promise(promise, {
@@ -123,6 +124,7 @@ export function CardOptionsModal() {
       <Dialog
         open={isCardOptionsOpen}
         onOpenChange={(isOpen) => {
+          console.log('object');
           useTaskStore.setState({ isEditable: false });
           setIsCardOptionsOpen(isOpen);
         }}
@@ -157,7 +159,10 @@ export function CardOptionsModal() {
                 type="button"
                 disabled={isUpdating}
                 variant={"ghost"}
-                onClick={() => setIsCardOptionsOpen(false)}
+                onClick={() => {
+                  useTaskStore.setState({isEditable: false})
+                  setIsCardOptionsOpen(false)
+                }}
               >
                 Cancel
               </Button>
@@ -239,10 +244,12 @@ function ProfileForm({ className, card }: any) {
     <div className={cn("grid items-start gap-4", className)}>
       <div className="grid gap-2">
         <Label htmlFor="description">Description</Label>
-        <Input
-          type="text"
+        <textarea
           id="description"
+          autoFocus
           defaultValue={card.description}
+          placeholder="Add new task..."
+          className="w-full rounded border border-orange-400 bg-orange-400/20 p-3 text-sm text-neutral-800 dark:text-neutral-50 placeholder-orange-300 focus:outline-0 outline-none white"
           onChange={(e) => {
             useTaskStore.setState({ isEditable: true });
             useTaskStore.setState({

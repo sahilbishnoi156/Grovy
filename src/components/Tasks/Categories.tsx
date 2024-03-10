@@ -75,7 +75,7 @@ export const Categories = ({
         link: doc.data().link || undefined,
         file: doc.data().file || undefined,
         ...(doc.data().timeBound && {timeBound: {
-          start: new Date(doc.data().timeBound.start?.seconds * 1000 ),
+          start: doc.data().timeBound?.start ? new Date(doc.data().timeBound.start?.seconds * 1000 ) : undefined,
           end: doc.data().timeBound?.end ? new Date(doc.data().timeBound.end?.seconds * 1000 ) : undefined,
           isCompleted: doc.data().timeBound.isCompleted
         } || undefined} ),

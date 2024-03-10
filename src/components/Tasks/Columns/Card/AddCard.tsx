@@ -82,7 +82,7 @@ export const AddCard = ({ id, setCards }: AddCardProps) => {
             autoFocus
             ref={ref}
             placeholder="Add new task..."
-            className="w-full rounded border border-violet-400 bg-violet-400/20 p-3 text-sm text-neutral-800 dark:text-neutral-50 placeholder-violet-300 focus:outline-0 outline-none"
+            className="w-full rounded border border-orange-400 bg-orange-400/20 p-3 text-sm text-neutral-800 dark:text-neutral-50 placeholder-orange-300 focus:outline-0 outline-none"
           />
           <div className="flex gap-2 items-center">
             <AddLink setLink={setLink} link={link} />
