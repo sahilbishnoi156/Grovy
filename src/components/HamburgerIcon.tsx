@@ -1,18 +1,13 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   Sheet,
   SheetClose,
   SheetContent,
-  SheetDescription,
-  SheetFooter,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { CgMenuLeft } from "react-icons/cg";
 import { LuFiles } from "react-icons/lu";
 import { CgGoogleTasks } from "react-icons/cg";
@@ -20,7 +15,7 @@ import { PiSignOutBold } from "react-icons/pi";
 import { ThemeToggle } from "./ThemeToggle";
 import { Calendar, Moon, Sun } from "lucide-react";
 import { LuLock } from "react-icons/lu";
-import { CiCalendarDate } from "react-icons/ci";
+import { RiSketching } from "react-icons/ri";
 import {
   SignInButton,
   SignOutButton,
@@ -81,19 +76,6 @@ export function HamburgerIcon() {
 const WhenSignedInButtons = ({ user, setIsOpen }: any) => {
   return (
     <div className="grid gap-4 pt-5">
-      <div className="flex gap-3 items-center">
-        <Avatar>
-          <AvatarImage
-            src={
-              user?.hasImage ? user?.imageUrl : "https://github.com/shadcn.png"
-            }
-            alt={user?.fullName || "voiderUser"}
-          />
-          <AvatarFallback>{user?.fullName || "voiderUser"}</AvatarFallback>
-        </Avatar>
-        <span>{user?.fullName || "Voider user"}</span>
-        <span className="sr-only">Logged In User</span>
-      </div>
       <Link href={"/tasks"} className="w-full">
         <Button
           variant={"ghost"}
@@ -114,6 +96,17 @@ const WhenSignedInButtons = ({ user, setIsOpen }: any) => {
           <LuFiles className="h-[1.3rem] w-[1.3rem] transition-all group-hover:scale-110" />
           <span>Files</span>
           <span className="sr-only">Files</span>
+        </Button>
+      </Link>
+      <Link href={"/sketch"} className="w-full">
+        <Button
+          variant={"ghost"}
+          className="justify-start gap-3 text-md h-12 group w-full pl-2"
+          onClick={() => setIsOpen(false)}
+        >
+          <RiSketching className="h-[1.3rem] w-[1.3rem] transition-all group-hover:scale-110" />
+          <span>Sketch</span>
+          <span className="sr-only">Sketch</span>
         </Button>
       </Link>
       <ThemeToggle>
@@ -149,19 +142,6 @@ const WhenSignedInButtons = ({ user, setIsOpen }: any) => {
 const WhenSignedOutButtons = ({ user, setIsOpen }: any) => {
   return (
     <div className="grid gap-4 pt-5">
-      <div className="flex gap-3 items-center">
-        <Avatar>
-          <AvatarImage
-            src={
-              user?.hasImage ? user?.imageUrl : "https://github.com/shadcn.png"
-            }
-            alt={user?.fullName || "voiderUser"}
-          />
-          <AvatarFallback>{user?.fullName || "voiderUser"}</AvatarFallback>
-        </Avatar>
-        <span>{user?.fullName || "Voider user"}</span>
-        <span className="sr-only">Logged In User</span>
-      </div>
       <Button
         variant={"ghost"}
         className="justify-start gap-3 text-md h-12 group pl-3"
@@ -179,6 +159,15 @@ const WhenSignedOutButtons = ({ user, setIsOpen }: any) => {
         <LuLock className="h-[1.3rem] w-[1.3rem] transition-all group-hover:scale-110" />
         <span>Tasks</span>
         <span className="sr-only">Tasks</span>
+      </Button>
+      <Button
+        variant={"ghost"}
+        className="justify-start gap-3 text-md h-12 group pl-3"
+        disabled
+      >
+        <LuLock className="h-[1.3rem] w-[1.3rem] transition-all group-hover:scale-110" />
+        <span>Sketch</span>
+        <span className="sr-only">Sketch</span>
       </Button>
       <ThemeToggle>
         <Button
