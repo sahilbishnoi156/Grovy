@@ -21,10 +21,7 @@ export default function Home() {
           </h1>
           <h3 className="text-2xl">My Personal library</h3>
           <p className="text-neutral-500 mt-8">
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Assumenda
-            vero earum voluptatum, rem cupiditate quasi necessitatibus illum
-            repellendus? Officiis illum quibusdam autem odit veniam alias
-            sapiente mollitia velit, expedita dolorum.
+            Create your tasks, drawing&lsquo;s and upload files and attach them with your tasks. Create timebound tasks so you can get notified before time and you can  complete them easyly.
           </p>
           <Button variant={"primary"} className="mt-3 group">
             <Link href={"/files"} className="flex items-center gap-2 text-lg">
