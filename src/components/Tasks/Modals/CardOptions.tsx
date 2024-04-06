@@ -147,7 +147,7 @@ export function CardOptionsModal() {
           <DialogFooter className="">
             <Button
               type="button"
-              variant={"ghost"}
+              variant={"danger"}
               disabled={isUpdating}
               className="hover:text-red-600 gap-2"
               onClick={handleDeleteCard}
@@ -205,9 +205,9 @@ export function CardOptionsModal() {
         <DialogFooter className="p-4 gap-3">
           <Button
             type="button"
-            variant={"outline"}
+            variant={"danger"}
             disabled={isUpdating}
-            className="hover:text-red-600 gap-2"
+            className="gap-2"
             onClick={handleDeleteCard}
           >
             <Trash2 />
